@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+  <!-- ============================================
+       META & EXTERNAL RESOURCES
+       Purpose: Document metadata, SEO, fonts and stylesheets
+  ============================================ -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow">
+  
+  <!-- OG META TAGS -->
+  <meta property="og:title" content="ArilCode — Koleksi PDF Kelompok">
+  <meta property="og:description" content="Akses 5 dokumen tugas kelompok. Download PDF tugas sekolah dengan mudah dan aman.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pdf-bab2.vercel.app/">
+  <meta property="og:image" content="https://pdf-bab2.vercel.app/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://pdf-bab2.vercel.app/og-image.png">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
+
+  <link rel="icon" type="image/png" href="./Image/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="./Image/favicon.svg" />
+  <link rel="shortcut icon" href="./Image/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./Image/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="MyWebSite" />
+  <link rel="manifest" href="./Image/site.webmanifest" />
+  <title>ArilCode — Koleksi PDF Kelompok</title>
+</head>
+
+<body>
+  <!-- ============================================
+       LOCK SCREEN SECTION
+       Purpose: Restrict access until valid access code is entered
+       Features: Password input, error handling, theme toggle
+  ============================================ -->
+  <div id="lockScreen" class="lock-screen">
+    <div id="lockBox" class="lock-box">
+      <h2>Web Terkunci</h2>
+      <p>Masukkan kode akses untuk membuka</p>
+      
+      <div class="akses-box">
+        <!-- Access Code Input Container -->
+        <div class="input-wrapper">
+          <input type="password" id="accessCode" placeholder="Masukkan Kode Akses">
+          <i id="togglePassword" class="fa-solid fa-eye"></i>
+        </div>
+        
+        <!-- Error Message Display -->
+        <p id="errorMsg" class="error"></p>
+        
+        <!-- Submit Button -->
+        <button id="submitBtn">Buka Sekarang</button>
+        
+        <!-- Contact Information Marquee -->
+        <div class="marquee-box"><span>Hubungi Aril Jika Memiliki Kendala</span></div>
+        
+        <!-- Developer Credit -->
+        <div class="credit">Directed By ARill</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ============================================
+       MAIN CONTENT SECTION
+       Purpose: Primary website content displayed after successful authentication
+  ============================================ -->
+  <div id="mainContent" style="display: none;">
+    
+    <!-- ============================================
+         SITE HEADER & NAVIGATION
+         Purpose: Global navigation, branding and hero section
+    ============================================ -->
+    <header class="site-header">
+      <!-- Navigation Bar -->
+      <nav class="navbar">
+        <div class="brand"><a href="#home">ArilCode</a></div>
+        <ul class="nav-links">
+          <li><a href="#home">Beranda</a></li>
+          <li><a href="https://my-all-link.vercel.app/" target="_blank" rel="noopener noreferrer">Kontak</a></li>
+          <li><a href="#about">Tentang</a></li>
+        </ul>
+        <!-- Theme Toggle Action -->
+        <div class="actions">
+          <button id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"></button>
+        </div>
+      </nav>
+      
+      <!-- ============================================
+           HERO SECTION
+           Purpose: Welcome message and introduction to the archive
+      ============================================ -->
+      <section id="home" class="hero">
+        <div class="hero-content">
+          <h1>Selamat Datang di Arsip PDF Kelompok</h1>
+          <p>Di sini Anda dapat mengunduh dokumen-dokumen kelompok. Pilih dokumen pada bagian Unduhan.</p>
+        </div>
+      </section>
+    </header>
+    
+    <!-- ============================================
+         MAIN CONTENT WRAPPER
+    ============================================ -->
+    <main class="main">
+      
+      <!-- ============================================
+           DOWNLOADS SECTION
+           Purpose: Display and provide access to group PDF documents
+           Features: 5 document cards with download links and member avatars
+      ============================================ -->
+      <section id="downloads" class="downloads container">
+        <h2>Unduhan Dokumen</h2>
+        <p class="muted">Klik tombol "Unduh" untuk mengambil file PDF. Tersedia 5 dokumen</p>
+        
+        <div class="cards">
+          <!-- Document Card 1 -->
+          <article class="card">
+            <h3>Dokumen Kelompok 1</h3>
+            <p>Ringkasan singkat dokumen 1</p>
+            <div class="card-actions">
+              <a class="btn-outline secure-btn" href="./Pdf/PPTKelompok1.pdf" data-kode="1" download target="_blank">Unduh PDF</a>
+            </div>
+            <!-- Member Avatars Group 1 -->
+            <div class="member-avatars">
+              <span class="avatar" data-name="Rivaldo">R</span>
+              <span class="avatar" data-name="Irsyad">I</span>
+              <span class="avatar" data-name="Seno">S</span>
+              <span class="avatar" data-name="Resa">R</span>
+              <span class="avatar" data-name="Bagas">B</span>
+              <span class="avatar" data-name="Jona">J</span>
+              <span class="avatar" data-name="Rafi">R</span>
+            </div>
+          </article>
+          
+          <!-- Document Card 2 -->
+          <article class="card">
+            <h3>Dokumen Kelompok 2</h3>
+            <p>Ringkasan singkat dokumen 2</p>
+            <div class="card-actions">
+              <a class="btn-outline secure-btn" href="./Pdf/PPTKelompok2.pdf" data-kode="2" download target="_blank">Unduh PDF</a>
+              <a class="btn-outline secure-btn" href="https://all-my-project-theta.vercel.app/" data-kode="2" target="_blank">Tampilkan</a>
+            </div>
+            <!-- Member Avatars Group 2 -->
+            <div class="member-avatars">
+              <span class="avatar" data-name="Aril">A</span>
+              <span class="avatar" data-name="Fandi">F</span>
+              <span class="avatar" data-name="Andre">A</span>
+              <span class="avatar" data-name="Sandi">S</span>
+              <span class="avatar" data-name="Yuda">Y</span>
+              <span class="avatar" data-name="Agri">A</span>
+            </div>
+          </article>
+          
+          <!-- Document Card 3 -->
+          <article class="card">
+            <h3>Dokumen Kelompok 3</h3>
+            <p>Ringkasan singkat dokumen 3</p>
+            <div class="card-actions">
+              <a class="btn-outline secure-btn" href="./Pdf/PPTKelompok3.pdf" data-kode="3" download target="_blank">Unduh PDF</a>
+            </div>
+            <!-- Member Avatars Group 3 -->
+            <div class="member-avatars">
+              <span class="avatar" data-name="Keyla">K</span>
+              <span class="avatar" data-name="Selvia">S</span>
+              <span class="avatar" data-name="Meisya">M</span>
+              <span class="avatar" data-name="Petra">P</span>
+            </div>
+          </article>
+          
+          <!-- Document Card 4 -->
+          <article class="card">
+            <h3>Dokumen Kelompok 4</h3>
+            <p>Ringkasan singkat dokumen 4</p>
+            <div class="card-actions">
+              <a class="btn-outline secure-btn" href="./Pdf/PPTKelompok4.pdf" data-kode="4" download target="_blank">Unduh PDF</a>
+            </div>
+            <!-- Member Avatars Group 4 -->
+            <div class="member-avatars">
+              <span class="avatar" data-name="Aini">A</span>
+              <span class="avatar" data-name="Olvi">O</span>
+              <span class="avatar" data-name="Santiya">S</span>
+              <span class="avatar" data-name="Nur aini">N</span>
+            </div>
+          </article>
+          
+          <!-- Document Card 5 -->
+          <article class="card">
+            <h3>Dokumen Kelompok 5</h3>
+            <p>Ringkasan singkat dokumen 5</p>
+            <div class="card-actions">
+              <a class="btn-outline secure-btn" href="./Pdf/PPTKelompok5.pdf" data-kode="5" download target="_blank">Unduh PDF</a>
+            </div>
+            <!-- Member Avatars Group 5 -->
+            <div class="member-avatars">
+              <span class="avatar" data-name="Mayya">M</span>
+              <span class="avatar" data-name="Anggun">A</span>
+              <span class="avatar" data-name="Adila">A</span>
+              <span class="avatar" data-name="Meta">M</span>
+              <span class="avatar" data-name="Annisa">A</span>
+            </div>
+          </article>
+        </div>
+      </section>
+      
+      <!-- ============================================
+           ABOUT SECTION
+           Purpose: Information about the website and its purpose
+      ============================================ -->
+      <section id="about" class="about container">
+        <h2>Tentang</h2>
+        <p>Website ini dibuat untuk mempermudah anggota kelompok dan guru mengakses Dokumen PDF yang berkaitan dengan tugas kelompok</p>
+      </section>
+    </main>
+    
+    <!-- ============================================
+         SITE FOOTER
+         Purpose: Copyright and legal information
+    ============================================ -->
+    <footer class="site-footer">
+      <div class="container"><p>© 2026 ArilCode — Arsip PDF Kelompok Sekolah</p></div>
+    </footer>
+    
+    <!-- ============================================
+         POPUP MODAL
+         Purpose: Display notifications and error messages to user
+    ============================================ -->
+    <!-- TAMBAHIN POPUP KODE KELOMPOK SEBELUM </body> -->
+<div id="kodePopup" class="popup hidden">
+  <div class="popup-content">
+    <span id="kodePopupClose" class="popup-close">&times;</span>
+    <h3>Masukkan Kode Kelompok</h3>
+    <p id="kodePopupText">Untuk mengakses file ini</p>
+    
+    <input type="text" id="kodeInput" placeholder="Masukkan Kode" style="width: 100%; padding: 10px; margin: 10px 0; text-align: center;">
+    <button id="kodeSubmitBtn" class="btn-outline" style="width:100%">Buka</button>
+    <p id="kodeError"></p>
+  </div>
+</div>
+  
+  <!-- ============================================
+       THEME INITIALIZATION SCRIPT
+       Purpose: Apply saved theme preference from localStorage on page load
+  ============================================ -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('site-theme');
+      if (saved === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  
+  <!-- ============================================
+       MAIN APPLICATION SCRIPT
+       Purpose: Handle authentication, navigation, theme toggle and interactions
+  ============================================ -->
+  <script src="main.js?v=7"></script>
+</body>
+</html>

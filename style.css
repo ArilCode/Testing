@@ -1,0 +1,755 @@
+/* ============================================
+   ROOT VARIABLES & THEME CONFIGURATION
+   Purpose: Define color palette and design tokens for dark/light theme
+============================================ */
+:root {
+  --bg-1: #0f1724;
+  --bg-2: #0b1220;
+  --card: #0b1624;
+  --text: #e6eef8;
+  --muted: #98a7bd;
+  --accent: #6ea8ff;
+  --footer: #071023;
+  --glass: rgba(255, 255, 255, 0.03);
+  --btn-download: #2E7D32;
+  --btn-download-hover: #1B5E20;
+  --avatar-bg: #1565c0;
+  --avatar-bg-hover: #0D47A1;
+  --avatar-border: #ffffff;
+}
+
+/* ============================================
+   GLOBAL TRANSITIONS
+   Purpose: Smooth transition for theme switching
+============================================ */
+:root, body, .navbar, .hero, .card, .site-footer, .btn-outline, .about, .nav-links a {
+  transition: background-color 1.5s ease-in-out, background 1.5s ease-in-out, color 1.5s ease-in-out, border-color 1.5s ease-in-out, box-shadow 1.5s ease-in-out;
+}
+
+/* ============================================
+   LIGHT THEME OVERRIDE
+   Purpose: Alternative color scheme when data-theme="light" is active
+============================================ */
+[data-theme="light"] {
+  --bg-1: #f6f8fb;
+  --bg-2: #e8f1ff;
+  --card: #ffffff;
+  --text: #102a43;
+  --muted: #52667a;
+  --accent: #4c8cff;
+  --footer: #f1f5f9;
+  --glass: rgba(0,0,0,0.05);
+  --btn-download: #1565c0;
+  --btn-download-hover: #0D47A1;
+  --avatar-bg: #2E7D32;
+  --avatar-bg-hover: #1B5E20;
+  --avatar-border: rgba(0,0,0,0.5);
+}
+
+/* ============================================
+   BASE RESET & GLOBAL STYLES
+   Purpose: Base typography, background and layout foundation
+============================================ */
+* { 
+  box-sizing: border-box; 
+}
+
+html {
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(76,140,255,0.06), transparent 8%),
+    radial-gradient(900px 500px at 95% 90%, rgba(76,140,255,0.04), transparent 8%),
+    linear-gradient(180deg,var(--bg-1),var(--bg-2));
+  background-attachment: fixed;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Patrick Hand', cursive;
+  color: var(--text);
+  background: transparent;
+  padding-top: 100px;
+  transition: background-color .25s ease, color .25s ease;
+}
+
+/* Background Grid Overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 10px 10px;
+  pointer-events: none;
+  opacity: 0.7;
+  mix-blend-mode: overlay;
+}
+
+/* Scroll Lock States */
+body.locked {
+  overflow: hidden;
+}
+
+body.no-scroll {
+  overflow: hidden;
+}
+
+/* ============================================
+   LOCK SCREEN SECTION
+   Purpose: Authentication overlay styles
+============================================ */
+html.locked #mainContent {
+  display: none !important;
+}
+
+html.locked #lockScreen { 
+  display: flex !important;
+}
+
+#mainContent { 
+  display: block;
+}
+
+#lockScreen {
+  display: none;
+}
+
+.lock-screen {
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100vh;
+  background: var(--bg-1);
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  z-index: 9999; 
+  text-align: center;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.lock-box { 
+  border: 3px solid var(--muted);
+  padding: 25px 20px;
+  background: var(--card);
+  box-shadow: 5px 5px 0 var(--muted);
+  width: 100%;
+  max-width: 380px;
+  border-radius: 8px;
+}
+
+/* Lock Screen Input & Button */
+.lock-box input { 
+  padding: 10px; 
+  border: 2px solid var(--muted);
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: 1.1rem; 
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+  
+.lock-box button { 
+  padding: 10px 25px; 
+  background: var(--btn-download);
+  color: var(--text); 
+  cursor: pointer; 
+  font-size: 1.1rem;
+  border-radius: 4px;
+  transition: 0.2s;
+  border: none;
+}
+
+.lock-box button:hover {
+  background: var(--btn-download-hover);
+}
+
+/* Password Input Wrapper with Toggle Icon */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1px;
+}
+
+.input-wrapper input {
+  width: 100%;
+  text-align: center;
+  padding-right: 40px;
+  box-sizing: border-box;
+}
+
+.input-wrapper i {
+  position: absolute; 
+  right: 15px; 
+  top: 50%; 
+  transform: translateY(-50%);
+  cursor: pointer; 
+  color: #555;
+  font-size: 1.2rem;
+}
+
+.akses-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-items: center;
+  margin-top: 15px;
+  width: 100%;
+}
+
+.akses-box button {
+  width: 100%;
+  margin-top: 5px;
+}
+
+/* Error Message Display */
+.error { 
+  color: red; 
+  margin: 0 0 0 0;
+  font-size: 0.9rem;
+  height: 0;           
+  opacity: 0;          
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.error.show { 
+  height: 18px;        
+  opacity: 1;
+  margin-top: 5px;
+}
+
+/* Animated Marquee Text */
+.marquee-box {
+  width: 100%;
+  margin-top: 15px;
+  padding: 6px 0;
+  overflow: hidden;
+}
+
+.marquee-box span {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--text);
+  white-space: nowrap;
+  width: max-content;
+  animation: jalan-balik 2.5s linear infinite alternate;
+}
+
+@keyframes jalan-balik {
+ 0%   { transform: translateX(33%); }
+ 100% { transform: translateX(-33%); }
+}
+
+.credit {
+  margin-top: 8px;
+  margin-left: auto;
+  width: fit-content;
+  padding-right: 5px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* ============================================
+   MAIN CONTENT & LAYOUT CONTAINER
+============================================ */
+#mainContent { 
+  display: none;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ============================================
+   SITE HEADER & NAVIGATION BAR
+   Purpose: Sticky navigation with branding and theme toggle
+============================================ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 10px;
+  margin: 1rem;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+}
+
+[data-theme="light"] .navbar {
+  background: linear-gradient(180deg, rgba(255,255,255,0.3), rgba(255,255,255,0.12));
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+}
+
+.brand a { 
+  font-weight: 700;
+  color: var(--text); 
+  text-decoration: none; 
+  font-size: 1.1rem;
+}
+
+.nav-links {
+  list-style: none; 
+  display: flex; 
+  gap: 1rem; 
+  margin: 0; 
+  padding: 0;
+}
+
+.nav-links a { 
+  color: var(--muted); 
+  text-decoration: none;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px; 
+}
+
+.nav-links a:hover {
+  background: var(--glass);
+  color: var(--text); 
+}
+
+/* Theme Toggle Button */
+#theme-toggle {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--muted);
+}
+
+#theme-toggle:hover {
+  background: transparent;
+}
+
+section {
+  scroll-margin-top: 120px;
+}
+
+/* ============================================
+   HERO SECTION
+   Purpose: Welcome banner with glassmorphism effect
+============================================ */
+.hero {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  margin: .5rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 320px;
+  max-width: 1100px;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+}
+
+[data-theme="light"] .hero {
+  background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.hero-content {
+  max-width: 800px; 
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hero h1 { 
+  font-size: 2rem; 
+  margin: 0 0 0.5rem;
+}
+
+.hero p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+}
+
+/* ============================================
+   DOWNLOADS SECTION
+   Purpose: Grid layout for document cards
+============================================ */
+.downloads {
+  padding: 2rem 1rem;
+}
+
+.downloads h2 {
+  margin-top: 0; 
+  text-align: center; 
+}
+
+.muted { 
+  color: var(--muted);
+}
+
+.cards { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+  gap: 1rem; 
+  margin-top: 1rem; 
+}
+
+/* ============================================
+   DOCUMENT CARD COMPONENT
+   Purpose: Individual group document card with actions
+============================================ */
+.card {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6); 
+}
+
+[data-theme="light"] .card {
+  box-shadow: 0 6px 18px rgba(2,6,23,0.04);
+}
+
+.card h3 { 
+  margin: 0 0 0.5rem; 
+  text-align: center; 
+}
+
+.card p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+}
+
+.card-actions { 
+  display: flex; 
+  gap: 0.5rem; 
+  align-items: center; 
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Download Button */
+.btn-outline {
+  background: var(--btn-download);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background .2s ease;
+}
+
+.btn-outline:hover {
+  background: var(--btn-download-hover);
+}
+
+/* ============================================
+   MEMBER AVATARS COMPONENT
+   Purpose: Circular avatars with hover tooltip
+============================================ */
+.member-avatars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--glass);
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--avatar-bg), var(--avatar-bg-hover));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 2px solid var(--avatar-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
+  cursor: default;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.avatar:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--avatar-bg) 40%, transparent);
+  z-index: 10;
+  border-color: var(--btn-download);
+}
+
+/* Avatar Name Tooltip */
+.avatar::after {
+  content: attr(data-name);
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  background: var(--card);
+  color: var(--text);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border: 1px solid var(--glass);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 20;
+}
+
+.avatar::before {
+  content: '';
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid var(--card);
+  opacity: 0;
+  transition: all 0.2s ease;
+  z-index: 20;
+}
+
+.avatar:hover::after, .avatar:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+  bottom: -32px;
+}
+
+/* ============================================
+   ABOUT SECTION
+   Purpose: Information section with active highlight state
+============================================ */
+.about {
+  max-width: 100%;
+  text-align: center;
+  padding: 3rem 2rem;
+  border-radius: 12px;
+  transition: all 0.4s ease;
+  border: 2px solid transparent;
+}
+
+.about.active {
+  background: linear-gradient(135deg, rgba(110, 168, 255, 0.15), rgba(110, 168, 255, 0.05));
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 25px rgba(110, 168, 255, 0.25);
+}
+
+[data-theme="light"] .about.active {
+  background: linear-gradient(135deg, rgba(76, 140, 255, 0.15), rgba(76, 140, 255, 0.05));
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 25px rgba(76, 140, 255, 0.25);
+}
+
+.nav-links a.active {
+  background: var(--glass);
+  color: var(--text);
+}
+
+/* ============================================
+   SITE FOOTER
+   Purpose: Copyright and footer information
+============================================ */
+.site-footer {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  background: var(--footer);
+  color: var(--muted);
+}
+
+/* ============================================
+   POPUP MODAL COMPONENT
+   Purpose: Notification and alert dialog
+============================================ */
+.popup {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.popup.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.popup-content {
+  background: var(--card);
+  color: var(--text);
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  border: 1px solid var(--glass);
+  text-align: center;
+  position: relative;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.popup:not(.hidden) .popup-content {
+  transform: scale(1);
+}
+
+.popup-close {
+  position: absolute;
+  top: 8px; right: 12px;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.popup-close:hover {
+  color: var(--text);
+}
+
+
+/* ============================================
+   POPUP KODE KELOMPOK BARU
+   Purpose: Input kode 1-5 untuk akses file
+============================================ */
+/* #kodePopup .popup-content h3 { 
+  margin-top: 0; 
+  margin-bottom: 8px;
+}
+#kodePopup .popup-content p {
+  margin: 0 0 15px;
+  color: var(--muted);
+}
+#kodePopup .popup-content input {
+  background: var(--bg-2);
+  border: 2px solid var(--muted);
+  color: var(--text);
+  border-radius: 6px;
+  width: 100%; 
+  padding: 10px; 
+  margin: 10px 0; 
+  text-align: center;
+  font-size: 1rem;
+  font-family: 'Patrick Hand', cursive;
+}
+#kodePopup .popup-content button {
+  width: 100%;
+}
+#kodeError { 
+  color: red; 
+  height: 18px; 
+  margin-top: 5px;
+  font-size: 0.9rem;
+} */
+
+
+/* POPUP KODE KELOMPOK */
+#kodePopup .popup-content h3 { margin-top: 0; }
+#kodePopup .popup-content input {
+  background: var(--bg-2); border: 2px solid var(--muted);
+  color: var(--text); border-radius: 6px;
+}
+
+/* FIX ERROR KODE KELOMPOK */
+#kodeError { 
+  color: #ff4d4d; 
+  margin: 5px 0 0 0;
+  font-size: 0.9rem;
+  height: 0;           
+  opacity: 0;          
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+#kodeError.show { 
+  height: 18px;        
+  opacity: 1;
+}
+
+
+/* ============================================
+   RESPONSIVE MEDIA QUERIES
+   Purpose: Mobile and tablet layout adjustments
+============================================ */
+@media (max-width: 400px) {
+  .lock-box {
+    padding: 20px 15px;
+    box-shadow: 3px 3px 0 #333;
+  }
+  
+  .lock-box h2 {
+    font-size: 1.2rem;
+  }
+  
+  .popup-content {
+    padding: 1rem;
+    width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 16px;
+  }
+  
+  .hero h1 {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width:720px) {
+  body {
+    padding-top: 200px;
+  }
+  
+  .site-header {
+    position: fixed;
+    left: 0;
+    right: 0;
+  }
+  
+  .nav-links {
+    display: none;
+  }
+  
+  .main {
+    padding-top: 120px;
+  }
+  
+  .navbar {
+    padding: 0.5rem 0.8rem;
+    margin: .5rem;
+  }
+  .hero {
+    padding: 2rem 1rem;
+    min-height: 260px;
+  }
+}
