@@ -151,6 +151,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = currentBtn.getAttribute('href');
     const isDownload = currentBtn.hasAttribute('download');
     const kodeBenar = KODE_KELOMPOK[ currentBtn.getAttribute('data-kode') ];
+    
+    // TAMBAHAN: CEK KOSONG DULU
+    if (input === "") {
+      kodeError.innerText = `Kode tidak boleh kosong!`;
+      kodeError.classList.add('show');
+      kodeInput.focus();
+      setTimeout(() => kodeError.classList.remove('show'), 2000);
+      return; // stop disini
+    }
 
     if(input === kodeBenar){
       hideKodePopup();
