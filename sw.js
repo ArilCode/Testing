@@ -1,9 +1,9 @@
-const CACHE_NAME = "portal-tugas-v5";
+const CACHE_NAME = "portal-tugas-v6";
 const urlsToCache = [
   "index.html",
   "style.css",
   "main.js",
-  "manifest.json"
+  "site.webmanifest"
   // PDF ga usah disebutin di sini kalau pake sistem cache pas klik
 ];
 
