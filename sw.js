@@ -1,4 +1,4 @@
-const CACHE_NAME = "portal-tugas-v4";
+const CACHE_NAME = "portal-tugas-v5";
 const urlsToCache = [
   "index.html",
   "style.css",
