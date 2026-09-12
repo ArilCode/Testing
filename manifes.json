@@ -1,6 +1,6 @@
 {
-  "name": "Pdf Code By Aril",
-  "short_name": "Kelompok Aril",
+  "name": "Pdf ArilCode",
+  "short_name": "ArilCode",
   "description": "Aplikasi portal download tugas kelompok dengan kode akses",
   "start_url": "index.html",
   "display": "standalone",
