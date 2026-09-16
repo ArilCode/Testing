@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
 <link rel="icon" type="image/png" href="./favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
 <link rel="shortcut icon" href="./favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="MyWebSite" />
 <link rel="manifest" href="./site.webmanifest" />
+<meta name="theme-color" content="#1c2050">
 <title>Ular tangga</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Fredoka',sans-serif;user-select:none;-webkit-tap-highlight-color:transparent}
-body{background:#0f1130;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:6px}
+body{background:#0f1130;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:6px;flex-direction:column}
 #wrap{width:100%;max-width:470px;background:#1c2050;border-radius:22px;padding:10px}
 h1{text-align:center;color:#fff;font-size:18px} h1 span{color:#ffde59}
 .top{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}
@@ -51,6 +51,19 @@ h1{text-align:center;color:#fff;font-size:18px} h1 span{color:#ffde59}
 .btn{padding:10px 20px;background:linear-gradient(#ffde59,#ffb700);border:none;border-radius:22px;font-weight:800;box-shadow:0 4px 0 #b47f00;cursor:pointer;font-size:12px}
 #animLine{position:absolute;inset:6px;pointer-events:none;z-index:15;width:calc(100% - 12px);height:calc(100% - 12px)}
 @keyframes dashFlow{to{stroke-dashoffset:-28}}
+#menuBtn{display:none;background:#3a2a6a;border:1px solid #ffde59;color:#ffde59;padding:8px 14px;border-radius:12px;font-weight:800;font-size:11px;cursor:pointer}
+#menuBtn.show{display:block}
+#menuPopup{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:none;justify-content:center;align-items:center;z-index:100;padding:16px}
+#menuPopup.show{display:flex}
+.menu-card{background:#1e2150;padding:20px;border-radius:20px;text-align:center;width:100%;max-width:320px;border:2px solid #2c317a}
+.menu-card h2{color:#ffde59;margin-bottom:12px;font-size:16px}
+.menu-list{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.menu-list button{padding:12px;border:none;border-radius:12px;font-weight:700;font-size:12px;cursor:pointer}
+.m-primary{background:linear-gradient(#ffde59,#ffb700);color:#000;box-shadow:0 3px 0 #b47f00}
+.m-secondary{background:#2c317a;color:white}
+.m-danger{background:#5a2a3a;color:#ff8daa;border:1px solid #ff408144}
+footer{margin-top:10px;text-align:center;color:#6b6faa;font-size:9px;line-height:1.4}
+footer b{color:#ffde59}
 </style>
 </head>
 <body>
@@ -64,15 +77,28 @@ h1{text-align:center;color:#fff;font-size:18px} h1 span{color:#ffde59}
 </div>
 <div id="boardWrap"><div id="board"></div><svg id="animLine"></svg></div>
 <div id="players"></div>
-<div id="diceArea"><div id="log">Pilih mode!</div><div id="dice" onclick="humanRoll()"><div class="pip" id="p1"></div><div class="pip" id="p2"></div><div class="pip" id="p3"></div><div class="pip" id="p4"></div><div class="pip" id="p5"></div><div class="pip" id="p6"></div><div class="pip" id="p7"></div><div class="pip" id="p8"></div><div class="pip" id="p9"></div></div></div>
+<div id="diceArea"><div id="log">Pilih mode!</div><button id="menuBtn" onclick="openMenu()">☰ MENU</button><div id="dice" onclick="humanRoll()"><div class="pip" id="p1"></div><div class="pip" id="p2"></div><div class="pip" id="p3"></div><div class="pip" id="p4"></div><div class="pip" id="p5"></div><div class="pip" id="p6"></div><div class="pip" id="p7"></div><div class="pip" id="p8"></div><div class="pip" id="p9"></div></div></div>
+<footer>
+  <b>Ular Tangga Lucky v1.3.0</b> • PWA Offline<br>
+  Dibuat oleh <b>Aril & Ai kesayangan</b> • 2026
+</footer>
 </div>
+
 <div id="popup"><div class="card"><div style="font-size:50px">🏆</div><h2 id="winTitle" style="color:#ffde59">MENANG!</h2><p id="winDesc" style="color:#aaa;font-size:11px;margin-top:8px"></p><button class="btn" onclick="location.reload()">MAIN LAGI</button></div></div>
+
+<div id="menuPopup"><div class="menu-card">
+<h2>☰ MENU</h2>
+<p id="menuInfo" style="color:#aaa;font-size:10px"></p>
+<div class="menu-list">
+<button class="m-primary" onclick="closeMenu()">▶️ Lanjut Main</button>
+<button class="m-secondary" onclick="restartSame()">🔄 Ulang</button>
+<button class="m-danger" onclick="location.reload()">🏠 Keluar</button>
+</div>
+</div></div>
 
 <script>
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js')
-  .then(()=>console.log('PWA ready offline!'))
-  .catch(e=>console.log('SW fail',e));
+  navigator.serviceWorker.register('sw.js').then(()=>console.log('PWA ready')).catch(e=>console.log(e));
 }
 </script>
 
@@ -81,7 +107,6 @@ const SNAKES={97:78,95:24,92:84,62:37,48:12,35:6,16:4};
 const LADDERS={3:22,8:26,21:42,28:77,52:68,72:90,80:98};
 const COLORS=['#00e5ff','#ff4081','#ffde59','#69f0ae'], NAMES=['Biru','Merah','Kuning','Hijau'];
 let boardEl=document.getElementById('board'), players=[], turn=0, playing=false, moving=false, audioCtx, sixStreak=0, gameMode='mix', difficulty='normal', bossBotId=0;
-
 function initAudio(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }
 function tone(f,d,t='sine',v=0.2,s=0){ initAudio(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type=t; o.frequency.setValueAtTime(f,audioCtx.currentTime); if(s) o.frequency.linearRampToValueAtTime(f+s,audioCtx.currentTime+d); g.gain.setValueAtTime(v,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+d); o.start(); o.stop(audioCtx.currentTime+d); }
 function sfx(k){
@@ -108,6 +133,12 @@ function createBoard(){
  }
 }
 let playersEl=document.getElementById('players'), logEl=document.getElementById('log'), diceEl=document.getElementById('dice');
+function openMenu(){
+ document.getElementById('menuInfo').textContent = `Mode: ${gameMode} [${difficulty}]`;
+ document.getElementById('menuPopup').classList.add('show');
+}
+function closeMenu(){ document.getElementById('menuPopup').classList.remove('show'); }
+function restartSame(){ closeMenu(); startGame(); }
 function startGame(){
  createBoard();
  let c=+document.getElementById('pCount').value; gameMode=document.getElementById('mode').value; difficulty=document.getElementById('diff').value;
@@ -115,6 +146,7 @@ function startGame(){
  bossBotId=Math.floor(Math.random()*players.length);
  turn=0; playing=true; sixStreak=0; moving=false;
  document.getElementById('top').style.display='none';
+ document.getElementById('menuBtn').classList.add('show');
  render(); place(); showDice(1); updateLock();
  if(players[turn].type==='bot') setTimeout(botRoll,900);
 }
@@ -141,62 +173,28 @@ function place(){
   });
  });
 }
-
-// ===== CUMA INI YANG AKU UBAH - LUCKY VS SIAL EKSTRIM =====
 function rollByChance(table){ let r=Math.random(), sum=0; for(let [val,prob] of table){ sum+=prob; if(r<=sum) return val; } return table[table.length-1][0]; }
 function getDiceForPlayer(p){
- // MANUSIA vs MANUSIA = fair semua
  if(gameMode==='human') return Math.floor(Math.random()*6)+1;
-
  if(p.type==='human'){
-  if(difficulty==='easy'){
-   // 1. MUDAH manusia vs bot: manusia chance menang SANGAT TINGGI, naik tangga, dadu tinggi 85% lucky, bot sial
-   return rollByChance([[6,0.45],[5,0.40],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); // 85% 5-6
-  }
-  if(difficulty==='hard'){
-   // 3. SULIT manusia vs bot: manusia kesempatan menang sangat kecillllll, BOT lucky tinggi, manusia sial
-   return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); // 85% 1-2 sial
-  }
-  // 2. NORMAL: 50:50 sama
+  if(difficulty==='easy'){ return rollByChance([[6,0.45],[5,0.40],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); }
+  if(difficulty==='hard'){ return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); }
   return Math.floor(Math.random()*6)+1;
  }
-
- // BOT
  if(gameMode==='bot'){
   if(difficulty==='easy'){
-   // 1. MUDAH bot vs bot: salah satu bot lucky seperti manusia tadi, yang lain sial -> cepet menang satu
-   if(p.id===bossBotId){
-    return rollByChance([[6,0.45],[5,0.40],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); // lucky 85%
-   } else {
-    return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); // sial 85%
-   }
+   if(p.id===bossBotId){ return rollByChance([[6,0.45],[5,0.40],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); } else { return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); }
   }
   if(difficulty==='hard'){
-   // 3. SULIT bot vs bot: salah satu chance SANGAT TINGGI menang, satunya sangat sial
-   if(p.id===bossBotId){
-    return rollByChance([[6,0.50],[5,0.35],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); // 85%++ super lucky
-   } else {
-    return rollByChance([[1,0.50],[2,0.35],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); // 85%++ super sial
-   }
+   if(p.id===bossBotId){ return rollByChance([[6,0.50],[5,0.35],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); } else { return rollByChance([[1,0.50],[2,0.35],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); }
   }
-  // 2. NORMAL bot vs bot: semua kesempatan sama
   return Math.floor(Math.random()*6)+1;
  }
-
- // MIX manusia vs bot
- if(difficulty==='easy'){
-  // BOT nya sial aja, manusia lucky banyak
-  return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); // BOT sial 85%
- }
- if(difficulty==='hard'){
-  // BOT lucky tinggi, manusia sial
-  return rollByChance([[6,0.50],[5,0.35],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); // BOT lucky 85%++
- }
- // NORMAL 50:50
+ if(difficulty==='easy'){ return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); }
+ if(difficulty==='hard'){ return rollByChance([[6,0.50],[5,0.35],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); }
  return Math.floor(Math.random()*6)+1;
 }
 function getDice(){ let d=getDiceForPlayer(players[turn]); if(d===6) sixStreak++; else sixStreak=0; if(sixStreak>=3){ d=Math.floor(Math.random()*5)+1; sixStreak=0; } return d; }
-
 function humanRoll(){ if(!playing || moving) return; if(players[turn].type==='bot'){ sfx('no'); return; } doRoll(); }
 function botRoll(){ if(!playing || moving) return; if(players[turn].type!=='bot') return; doRoll(); }
 function doRoll(){
