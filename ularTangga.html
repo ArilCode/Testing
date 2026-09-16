@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<link rel="icon" type="image/png" href="./favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+<link rel="shortcut icon" href="./favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="MyWebSite" />
+<link rel="manifest" href="./site.webmanifest" />
+<title>Ular tangga</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Fredoka',sans-serif;user-select:none;-webkit-tap-highlight-color:transparent}
+body{background:#0f1130;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:6px}
+#wrap{width:100%;max-width:470px;background:#1c2050;border-radius:22px;padding:10px}
+h1{text-align:center;color:#fff;font-size:18px} h1 span{color:#ffde59}
+.top{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}
+.top select{flex:1;padding:10px 8px;border-radius:12px;border:none;background:#2c317a;color:white;font-weight:700;font-size:11px}
+#diffWrap{flex-basis:100%} #diffWrap select{width:100%;background:#3a2a6a;border:1px solid #ffde59}
+#boardWrap{position:relative;background:#0a0d2a;border-radius:16px;padding:6px;overflow:hidden}
+#board{display:grid;grid-template-columns:repeat(10, minmax(0,1fr));gap:4px;width:100%}
+.cell{position:relative;background:#2a2f7a;border-radius:8px;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;transition:transform 0.2s}
+.cell b{font-size:11px;color:#fff}.cell small{font-size:6px;font-weight:800;padding:1px 4px;border-radius:8px;margin-top:2px}
+.cell.ladder{background:linear-gradient(145deg,#2e5a28,#244a1e);border:1px solid #69f0ae44}.cell.ladder small{background:#69f0ae;color:#0a2a12}
+.cell.snake{background:linear-gradient(145deg,#5a2a3a,#4a1a2a);border:1px solid #ff408144}.cell.snake small{background:#ff4081;color:#fff}
+.cell.active{outline:2.5px solid #ffde59;box-shadow:0 0 12px #ffde59;z-index:2}
+.cell.anim-up{animation:upAnim 1s ease 2}
+.cell.anim-down{animation:downAnim 1s ease 2}
+@keyframes upAnim{0%{transform:scale(1)}50%{transform:scale(1.15);box-shadow:0 0 20px #69f0ae;background:#3a7a35}100%{transform:scale(1)}}
+@keyframes downAnim{0%{transform:scale(1)}50%{transform:scale(1.15);box-shadow:0 0 20px #ff4081;background:#7a2a3a}100%{transform:scale(1)}}
+.pion{position:absolute;width:20px;height:20px;border-radius:50%;border:2.2px solid white;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:white;z-index:10;transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);left:50%;top:50%;pointer-events:none}
+.pion.active{transform:translate(-50%,-50%) scale(1.35) translateY(-6px);box-shadow:0 0 14px currentColor;border-color:#ffde59;z-index:12}
+.pion.kicked{animation:kick 0.6s ease forwards}
+@keyframes kick{0%{transform:translate(-50%,-50%) scale(1.3)}30%{transform:translate(-50%,-130%) scale(1.5) rotate(20deg)}100%{transform:translate(-50%,-50%) scale(0)}}
+#players{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:10px 0}
+.p-card{background:rgba(0,0,0,0.25);padding:6px 2px;border-radius:10px;text-align:center;border:2px solid transparent}
+.p-card.turn{border-color:#ffde59;background:rgba(255,222,89,0.15)}.p-card b{font-size:9px;color:white}.p-card span{font-size:8px;color:#aaa}
+#diceArea{display:flex;align-items:center;gap:10px;background:#24286a;border-radius:14px;padding:10px}
+#log{flex:1;color:#c2c6f0;font-size:10.5px;line-height:1.3}
+#dice{width:58px;height:58px;flex-shrink:0;background:white;border-radius:12px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:6px;gap:2px;box-shadow:0 4px 0 #999;cursor:pointer;position:relative}
+#dice.disabled{opacity:0.35;pointer-events:none;filter:grayscale(1);transform:translateY(3px)}
+#dice.bot-turn{opacity:0.35;pointer-events:none;filter:grayscale(1)} #dice.bot-turn::after{content:'BOT';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.65);color:#ffde59;font-size:10px;font-weight:900;border-radius:12px}
+#dice.rolling{animation:shake 0.08s infinite}
+@keyframes shake{0%{transform:rotate(-8deg) scale(1.08)}50%{transform:rotate(8deg) scale(1.08)}100%{transform:rotate(-8deg) scale(1.08)}}
+.pip{width:8px;height:8px;background:#222;border-radius:50%;opacity:0;margin:auto}.pip.on{opacity:1}
+#popup{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:none;justify-content:center;align-items:center;z-index:99;padding:16px} #popup.show{display:flex}
+.card{background:#1e2150;padding:22px;border-radius:20px;text-align:center;width:100%;max-width:300px}
+.btn{padding:10px 20px;background:linear-gradient(#ffde59,#ffb700);border:none;border-radius:22px;font-weight:800;box-shadow:0 4px 0 #b47f00;cursor:pointer;font-size:12px}
+#animLine{position:absolute;inset:6px;pointer-events:none;z-index:15;width:calc(100% - 12px);height:calc(100% - 12px)}
+@keyframes dashFlow{to{stroke-dashoffset:-28}}
+</style>
+</head>
+<body>
+<div id="wrap">
+<h1>🐍 <span>ULAR TANGGA LUCKY</span> 🪜</h1>
+<div class="top" id="top">
+<select id="pCount"><option value="2">2 Pemain</option><option value="3">3 Pemain</option><option value="4" selected>4 Pemain</option></select>
+<select id="mode"><option value="mix">Manusia + BOT</option><option value="human">Manusia vs Manusia</option><option value="bot">BOT vs BOT</option></select>
+<div id="diffWrap"><select id="diff"><option value="easy">😊 Mudah - Lucky Manusia</option><option value="normal" selected>😐 Normal - 50:50</option><option value="hard">😈 Sulit - BOT Lucky</option></select></div>
+<button class="btn" onclick="startGame()">MULAI</button>
+</div>
+<div id="boardWrap"><div id="board"></div><svg id="animLine"></svg></div>
+<div id="players"></div>
+<div id="diceArea"><div id="log">Pilih mode!</div><div id="dice" onclick="humanRoll()"><div class="pip" id="p1"></div><div class="pip" id="p2"></div><div class="pip" id="p3"></div><div class="pip" id="p4"></div><div class="pip" id="p5"></div><div class="pip" id="p6"></div><div class="pip" id="p7"></div><div class="pip" id="p8"></div><div class="pip" id="p9"></div></div></div>
+</div>
+<div id="popup"><div class="card"><div style="font-size:50px">🏆</div><h2 id="winTitle" style="color:#ffde59">MENANG!</h2><p id="winDesc" style="color:#aaa;font-size:11px;margin-top:8px"></p><button class="btn" onclick="location.reload()">MAIN LAGI</button></div></div>
+
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js')
+  .then(()=>console.log('PWA ready offline!'))
+  .catch(e=>console.log('SW fail',e));
+}
+</script>
+
+<script>
+const SNAKES={97:78,95:24,92:84,62:37,48:12,35:6,16:4};
+const LADDERS={3:22,8:26,21:42,28:77,52:68,72:90,80:98};
+const COLORS=['#00e5ff','#ff4081','#ffde59','#69f0ae'], NAMES=['Biru','Merah','Kuning','Hijau'];
+let boardEl=document.getElementById('board'), players=[], turn=0, playing=false, moving=false, audioCtx, sixStreak=0, gameMode='mix', difficulty='normal', bossBotId=0;
+
+function initAudio(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }
+function tone(f,d,t='sine',v=0.2,s=0){ initAudio(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type=t; o.frequency.setValueAtTime(f,audioCtx.currentTime); if(s) o.frequency.linearRampToValueAtTime(f+s,audioCtx.currentTime+d); g.gain.setValueAtTime(v,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+d); o.start(); o.stop(audioCtx.currentTime+d); }
+function sfx(k){
+ if(k==='dice'){ tone(180,0.12,'square',0.22); setTimeout(()=>tone(420,0.1,'sine',0.18),70);}
+ if(k==='step') tone(480+Math.random()*200,0.1,'sine',0.13,60);
+ if(k==='ladder'){ tone(300,0.13,'sine',0.22); setTimeout(()=>tone(520,0.13,'sine',0.22),100); setTimeout(()=>tone(880,0.26,'sine',0.28),210);}
+ if(k==='snake'){ tone(680,0.12,'sawtooth',0.2,-350); setTimeout(()=>tone(260,0.26,'sawtooth',0.2),120);}
+ if(k==='win'){ tone(400,0.16,'sine',0.28,80); setTimeout(()=>tone(600,0.16,'sine',0.28,80),140); setTimeout(()=>tone(900,0.45,'sine',0.32),280);}
+ if(k==='bust'){ tone(150,0.4,'sawtooth',0.25);}
+ if(k==='kick'){ tone(800,0.08,'square',0.3); setTimeout(()=>tone(120,0.35,'sawtooth',0.35,-100),80); }
+ if(k==='no'){ tone(100,0.2,'square',0.15); }
+}
+const diceMap={1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]};
+function showDice(n){ for(let i=1;i<=9;i++) document.getElementById('p'+i).classList.remove('on'); (diceMap[n]||[]).forEach(i=>document.getElementById('p'+i).classList.add('on')); }
+function createBoard(){
+ boardEl.innerHTML='';
+ for(let row=0; row<10; row++){
+  for(let col=0; col<10; col++){
+   let r=row; let base=100-r*10; let n; if(r%2===0){ n=base-col; } else { n=base-9+col; }
+   let d=document.createElement('div'); d.className='cell'; d.id='c'+n;
+   let lbl=''; if(LADDERS[n]){ d.classList.add('ladder'); lbl=`<small>↑${LADDERS[n]}</small>`; } if(SNAKES[n]){ d.classList.add('snake'); lbl=`<small>↓${SNAKES[n]}</small>`; }
+   d.innerHTML=`<b>${n}</b>${lbl}`; boardEl.appendChild(d);
+  }
+ }
+}
+let playersEl=document.getElementById('players'), logEl=document.getElementById('log'), diceEl=document.getElementById('dice');
+function startGame(){
+ createBoard();
+ let c=+document.getElementById('pCount').value; gameMode=document.getElementById('mode').value; difficulty=document.getElementById('diff').value;
+ players=[]; for(let i=0;i<c;i++){ let type; if(gameMode==='human') type='human'; else if(gameMode==='bot') type='bot'; else type=(i===0?'human':'bot'); players.push({id:i,name:NAMES[i],color:COLORS[i],type,pos:1,win:false}); }
+ bossBotId=Math.floor(Math.random()*players.length);
+ turn=0; playing=true; sixStreak=0; moving=false;
+ document.getElementById('top').style.display='none';
+ render(); place(); showDice(1); updateLock();
+ if(players[turn].type==='bot') setTimeout(botRoll,900);
+}
+function updateLock(){
+ diceEl.classList.remove('disabled','bot-turn');
+ if(!playing || moving){ diceEl.classList.add('disabled'); return; }
+ let cur=players[turn];
+ if(cur.type==='bot'){ diceEl.classList.add('bot-turn'); logEl.innerHTML=`🤖 ${cur.name} BOT [${difficulty}]`; }
+ else { logEl.innerHTML=`🎲 Giliran <b style="color:${cur.color}">${cur.name}</b> [${difficulty}]`; }
+ if(gameMode==='bot'){ diceEl.classList.add('disabled','bot-turn'); logEl.innerHTML=`🤖 BOT vs BOT [${difficulty}]`; }
+}
+function render(){ playersEl.innerHTML=''; players.forEach((p,i)=>{ let d=document.createElement('div'); d.className='p-card'+(i===turn?' turn':''); d.innerHTML=`<div style="width:10px;height:10px;border-radius:50%;background:${p.color};margin:0 auto 2px;border:1.5px solid white"></div><b>${p.name}${p.type==='bot'?' 🤖':''}${p.id===bossBotId&&difficulty!=='normal'&&gameMode==='bot'?' 👑':''}</b><br><span>${p.pos}</span>`; playersEl.appendChild(d); }); document.querySelectorAll('.cell').forEach(c=>c.classList.remove('active')); let cur=document.getElementById('c'+players[turn].pos); if(cur) cur.classList.add('active'); }
+function place(){
+ document.querySelectorAll('.pion').forEach(e=>e.remove());
+ let g={}; players.forEach(p=>{if(!g[p.pos]) g[p.pos]=[]; g[p.pos].push(p);});
+ Object.keys(g).forEach(pos=>{
+  let cell=document.getElementById('c'+pos); if(!cell) return;
+  g[pos].forEach((p,idx)=>{
+   let pion=document.createElement('div'); pion.className='pion'+(players[turn].id===p.id?' active':''); pion.id='pion-'+p.id; pion.style.background=p.color; pion.textContent=p.id+1;
+   let offsets=[{x:-8,y:-8},{x:8,y:-8},{x:-8,y:8},{x:8,y:8}]; let off=offsets[idx%4];
+   pion.style.transform=`translate(calc(-50% + ${off.x}px), calc(-50% + ${off.y}px))`;
+   if(players[turn].id===p.id){ pion.style.transform=`translate(calc(-50% + ${off.x}px), calc(-50% + ${off.y-6}px)) scale(1.35)`; }
+   cell.appendChild(pion);
+  });
+ });
+}
+
+// ===== CUMA INI YANG AKU UBAH - LUCKY VS SIAL EKSTRIM =====
+function rollByChance(table){ let r=Math.random(), sum=0; for(let [val,prob] of table){ sum+=prob; if(r<=sum) return val; } return table[table.length-1][0]; }
+function getDiceForPlayer(p){
+ // MANUSIA vs MANUSIA = fair semua
+ if(gameMode==='human') return Math.floor(Math.random()*6)+1;
+
+ if(p.type==='human'){
+  if(difficulty==='easy'){
+   // 1. MUDAH manusia vs bot: manusia chance menang SANGAT TINGGI, naik tangga, dadu tinggi 85% lucky, bot sial
+   return rollByChance([[6,0.45],[5,0.40],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); // 85% 5-6
+  }
+  if(difficulty==='hard'){
+   // 3. SULIT manusia vs bot: manusia kesempatan menang sangat kecillllll, BOT lucky tinggi, manusia sial
+   return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); // 85% 1-2 sial
+  }
+  // 2. NORMAL: 50:50 sama
+  return Math.floor(Math.random()*6)+1;
+ }
+
+ // BOT
+ if(gameMode==='bot'){
+  if(difficulty==='easy'){
+   // 1. MUDAH bot vs bot: salah satu bot lucky seperti manusia tadi, yang lain sial -> cepet menang satu
+   if(p.id===bossBotId){
+    return rollByChance([[6,0.45],[5,0.40],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); // lucky 85%
+   } else {
+    return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); // sial 85%
+   }
+  }
+  if(difficulty==='hard'){
+   // 3. SULIT bot vs bot: salah satu chance SANGAT TINGGI menang, satunya sangat sial
+   if(p.id===bossBotId){
+    return rollByChance([[6,0.50],[5,0.35],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); // 85%++ super lucky
+   } else {
+    return rollByChance([[1,0.50],[2,0.35],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); // 85%++ super sial
+   }
+  }
+  // 2. NORMAL bot vs bot: semua kesempatan sama
+  return Math.floor(Math.random()*6)+1;
+ }
+
+ // MIX manusia vs bot
+ if(difficulty==='easy'){
+  // BOT nya sial aja, manusia lucky banyak
+  return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); // BOT sial 85%
+ }
+ if(difficulty==='hard'){
+  // BOT lucky tinggi, manusia sial
+  return rollByChance([[6,0.50],[5,0.35],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); // BOT lucky 85%++
+ }
+ // NORMAL 50:50
+ return Math.floor(Math.random()*6)+1;
+}
+function getDice(){ let d=getDiceForPlayer(players[turn]); if(d===6) sixStreak++; else sixStreak=0; if(sixStreak>=3){ d=Math.floor(Math.random()*5)+1; sixStreak=0; } return d; }
+
+function humanRoll(){ if(!playing || moving) return; if(players[turn].type==='bot'){ sfx('no'); return; } doRoll(); }
+function botRoll(){ if(!playing || moving) return; if(players[turn].type!=='bot') return; doRoll(); }
+function doRoll(){
+ moving=true; diceEl.classList.add('disabled','rolling'); sfx('dice');
+ let r=0, iv=setInterval(()=>{ showDice(Math.floor(Math.random()*6)+1); if(++r>12){ clearInterval(iv); diceEl.classList.remove('rolling'); let d=getDice(); showDice(d); moveStep(players[turn],d); } },70);
+}
+function drawLine(from,to,color){
+ let svg=document.getElementById('animLine'); svg.innerHTML='';
+ let fromEl=document.getElementById('c'+from), toEl=document.getElementById('c'+to);
+ if(!fromEl||!toEl) return;
+ let wrap=document.getElementById('boardWrap').getBoundingClientRect();
+ let f=fromEl.getBoundingClientRect(), t=toEl.getBoundingClientRect();
+ let x1=f.left + f.width/2 - wrap.left; let y1=f.top + f.height/2 - wrap.top;
+ let x2=t.left + t.width/2 - wrap.left; let y2=t.top + t.height/2 - wrap.top;
+ let line=document.createElementNS('http://www.w3.org/2000/svg','line');
+ line.setAttribute('x1',x1); line.setAttribute('y1',y1); line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+ line.setAttribute('stroke',color); line.setAttribute('stroke-width','5'); line.setAttribute('stroke-linecap','round'); line.setAttribute('stroke-dasharray','10 8');
+ line.style.animation='dashFlow 0.4s linear infinite'; line.style.filter=`drop-shadow(0 0 6px ${color})`;
+ svg.appendChild(line); setTimeout(()=>{ svg.innerHTML=''; },1300);
+}
+function moveStep(p,steps){
+ let target=p.pos+steps;
+ if(target>100){
+  let over=target-100; let bounce=100-over;
+  logEl.innerHTML=`Lewat 100! ${p.pos}+${steps}=${target} → mantul ${bounce}`; sfx('bust');
+  let cur=p.pos; let up=setInterval(()=>{ if(cur<100){ cur++; p.pos=cur; render(); place(); sfx('step'); } else{ clearInterval(up); setTimeout(()=>{ let down=setInterval(()=>{ if(p.pos>bounce){ p.pos--; render(); place(); sfx('step'); } else{ clearInterval(down); if(SNAKES[p.pos] || LADDERS[p.pos]){ handleSnakeLadder(p); } else { finishAfterMove(p); } } },180); },250); } },180); return;
+ }
+ logEl.innerHTML=`${p.name} dapat ${steps} → ${target}`;
+ let cur=p.pos; let it=setInterval(()=>{ if(cur<target){ cur++; p.pos=cur; render(); place(); sfx('step'); } else{ clearInterval(it); handleSnakeLadder(p); } },190);
+}
+function handleSnakeLadder(p){
+ if(LADDERS[p.pos]){
+  let to=LADDERS[p.pos]; logEl.innerHTML=`🪜 TANGGA! ${p.pos} → ${to} ⬆️`; sfx('ladder');
+  let from=document.getElementById('c'+p.pos); if(from) from.classList.add('anim-up');
+  drawLine(p.pos,to,'#69f0ae');
+  setTimeout(()=>{ p.pos=to; render(); place(); let dest=document.getElementById('c'+to); if(dest) dest.classList.add('anim-up'); setTimeout(()=>checkKick(p),500); },700);
+ } else if(SNAKES[p.pos]){
+  let to=SNAKES[p.pos]; logEl.innerHTML=`🐍 ULAR! ${p.pos} → ${to} ⬇️`; sfx('snake');
+  let from=document.getElementById('c'+p.pos); if(from) from.classList.add('anim-down');
+  drawLine(p.pos,to,'#ff4081');
+  setTimeout(()=>{ p.pos=to; render(); place(); let dest=document.getElementById('c'+to); if(dest) dest.classList.add('anim-down'); setTimeout(()=>checkKick(p),500); },700);
+ } else { checkKick(p); }
+}
+function checkKick(p){
+ let victims=players.filter(o=> o.id!==p.id && o.pos===p.pos && o.pos!==1 && o.pos!==100);
+ if(victims.length>0){
+  victims.forEach(v=>{ sfx('kick'); let vp=document.getElementById('pion-'+v.id); if(vp) vp.classList.add('kicked'); });
+  logEl.innerHTML=`💥 ${p.name} NENDANG ${victims.map(v=>v.name).join(',')}!`;
+  setTimeout(()=>{ victims.forEach(v=>v.pos=1); render(); place(); finishAfterMove(p); },600);
+ } else { finishAfterMove(p); }
+}
+function finishAfterMove(p){
+ if(p.pos===100){ p.win=true; sfx('win'); document.getElementById('winTitle').textContent=p.name+' MENANG!'; document.getElementById('winDesc').textContent=`Mode ${gameMode} [${difficulty}]`; document.getElementById('popup').classList.add('show'); playing=false; moving=false; diceEl.classList.add('disabled'); return; }
+ let isSix=document.querySelectorAll('.pip.on').length===6;
+ if(isSix){ moving=false; logEl.innerHTML=`🎉 Dapat 6! ${p.name} lempar lagi!`; updateLock(); if(p.type==='bot') setTimeout(botRoll,900); }
+ else { sixStreak=0; nextTurn(); }
+}
+function nextTurn(){ turn=(turn+1)%players.length; while(players[turn].win) turn=(turn+1)%players.length; render(); place(); moving=false; updateLock(); if(players[turn].type==='bot') setTimeout(botRoll,1100); }
+createBoard(); showDice(1); updateLock();
+</script>
+</body>
+</html>
