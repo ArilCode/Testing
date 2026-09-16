@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ular-tangga-v2';
+const CACHE_NAME = 'ular-tangga-v2.3.1';
 
 // list semua file penting aja, folder ikut ke-cache otomatis pas di-fetch
 const FILES_TO_CACHE = [
