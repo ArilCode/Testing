@@ -99,9 +99,19 @@ footer b{color:#ffde59}
 </div></div>
 
 <script>
- if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=' + Date.now(), { updateViaCache: 'none' });
- }
+// NUKLIR - HAPUS SEMUA SW & CACHE LAMA
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    for (let reg of regs) {
+      reg.unregister().then(() => console.log('SW lama di-unregister'));
+    }
+  });
+  if (window.caches) {
+    caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+  }
+  // jangan register dulu pas dev
+  // navigator.serviceWorker.register('sw.js') 
+}
 </script>
 
 <script>
