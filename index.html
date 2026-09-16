@@ -99,9 +99,9 @@ footer b{color:#ffde59}
 </div></div>
 
 <script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').then(()=>console.log('PWA ready')).catch(e=>console.log(e));
-}
+ if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js?v=' + Date.now(), { updateViaCache: 'none' });
+ }
 </script>
 
 <script>
