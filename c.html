@@ -13,8 +13,9 @@
 <title>Ular tangga</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
 <style>
+html,body{overscroll-behavior:none;overscroll-behavior-y:contain}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Fredoka',sans-serif;user-select:none;-webkit-tap-highlight-color:transparent}
-body{background:#0f1130;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:6px;flex-direction:column}
+body{background:#0f1130;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:6px;flex-direction:column;touch-action:manipulation}
 #wrap{width:100%;max-width:470px;background:#1c2050;border-radius:22px;padding:10px}
 h1{text-align:center;color:#fff;font-size:18px} h1 span{color:#ffde59}
 .top{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}
@@ -77,23 +78,24 @@ footer b{color:#ffde59}
 </div>
 <div id="boardWrap"><div id="board"></div><svg id="animLine"></svg></div>
 <div id="players"></div>
-<div id="diceArea"><div id="log">Pilih mode!</div><button id="menuBtn" onclick="openMenu()">☰ MENU</button><div id="dice" onclick="humanRoll()"><div class="pip" id="p1"></div><div class="pip" id="p2"></div><div class="pip" id="p3"></div><div class="pip" id="p4"></div><div class="pip" id="p5"></div><div class="pip" id="p6"></div><div class="pip" id="p7"></div><div class="pip" id="p8"></div><div class="pip" id="p9"></div></div></div>
+<div id="diceArea"><div id="log">Pilih mode!</div><button id="menuBtn" onclick="openMenu()">MENU</button><div id="dice" onclick="humanRoll()"><div class="pip" id="p1"></div><div class="pip" id="p2"></div><div class="pip" id="p3"></div><div class="pip" id="p4"></div><div class="pip" id="p5"></div><div class="pip" id="p6"></div><div class="pip" id="p7"></div><div class="pip" id="p8"></div><div class="pip" id="p9"></div></div></div>
 <footer>
   <b>Ular Tangga Lucky v1.3.0</b> • PWA Offline<br>
-  Dibuat oleh <b>Aril & Ai kesayangan</b> • 2026
+  Dibuat oleh <b>Kamu & Meta AI</b> • 2026
 </footer>
 </div>
 
-<div id="popup"><div class="card"><div style="font-size:50px">🏆</div><h2 id="winTitle" style="color:#ffde59">MENANG!</h2><p id="winDesc" style="color:#aaa;font-size:11px;margin-top:8px"></p><button class="btn" onclick="location.reload()">MAIN LAGI</button></div></div>
+<div id="popup"><div class="card"><div style="font-size:50px">🏆</div><h2 id="winTitle" style="color:#ffde59">MENANG!</h2><p id="winDesc" style="color:#aaa;font-size:11px;margin-top:8px"></p><button class="btn" onclick="doExit()">MAIN LAGI</button></div></div>
 
 <div id="menuPopup"><div class="menu-card">
-<h2>☰ MENU</h2>
+<h2>MENU</h2>
 <p id="menuInfo" style="color:#aaa;font-size:10px"></p>
 <div class="menu-list">
 <button class="m-primary" onclick="closeMenu()">▶️ Lanjut Main</button>
 <button class="m-secondary" onclick="restartSame()">🔄 Ulang</button>
-<button class="m-danger" onclick="location.reload()">🏠 Keluar</button>
+<button class="m-danger" onclick="doExit()">🏠 Keluar</button>
 </div>
+<p style="color:#6b6faa;font-size:8px;margin-top:8px">Tutup tab untuk keluar paksa</p>
 </div></div>
 
 <script>
@@ -103,6 +105,36 @@ if('serviceWorker' in navigator){
 </script>
 
 <script>
+// ===== ANTI RELOAD KECUALI TUTUP TAB / KELUAR =====
+let allowExit = false;
+function doExit(){ allowExit = true; location.reload(); }
+
+// cegah F5, Ctrl+R, Ctrl+Shift+R
+document.addEventListener('keydown', function(e){
+  if(e.key === 'F5' || ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'r'))){
+    e.preventDefault(); e.stopPropagation(); return false;
+  }
+});
+
+// cegah pull to refresh di Android
+let lastTouchY = 0;
+document.addEventListener('touchstart', e=>{ lastTouchY = e.touches[0].clientY; }, {passive:false});
+document.addEventListener('touchmove', e=>{
+  let curY = e.touches[0].clientY;
+  if(window.scrollY===0 && curY > lastTouchY + 10){ e.preventDefault(); }
+}, {passive:false});
+
+// konfirmasi kalau mau reload / tutup tab pas lagi main
+window.addEventListener('beforeunload', function(e){
+  if(!allowExit && playing){
+    e.preventDefault();
+    e.returnValue = 'Game masih berjalan! Yakin mau keluar? Progress akan hilang.';
+    return e.returnValue;
+  }
+});
+// cegah klik kanan reload
+document.addEventListener('contextmenu', e=> e.preventDefault());
+
 const SNAKES={97:78,95:24,92:84,62:37,48:12,35:6,16:4};
 const LADDERS={3:22,8:26,21:42,28:77,52:68,72:90,80:98};
 const COLORS=['#00e5ff','#ff4081','#ffde59','#69f0ae'], NAMES=['Biru','Merah','Kuning','Hijau'];
