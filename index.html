@@ -2,300 +2,232 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <link rel="icon" type="image/png" href="./favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
 <link rel="shortcut icon" href="./favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="MyWebSite" />
+<meta name="apple-mobile-web-app-title" content="Aril Game" />
 <link rel="manifest" href="./site.webmanifest" />
-<meta name="theme-color" content="#1c2050">
-<title>Ular tangga</title>
+<title>Ular Tangga MABAR Hotspot</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
-html,body{overscroll-behavior:none;overscroll-behavior-y:contain}
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Fredoka',sans-serif;user-select:none;-webkit-tap-highlight-color:transparent}
-body{background:#0f1130;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:6px;flex-direction:column;touch-action:manipulation}
-#wrap{width:100%;max-width:470px;background:#1c2050;border-radius:22px;padding:10px}
-h1{text-align:center;color:#fff;font-size:18px} h1 span{color:#ffde59}
-.top{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}
-.top select{flex:1;padding:10px 8px;border-radius:12px;border:none;background:#2c317a;color:white;font-weight:700;font-size:11px}
-#diffWrap{flex-basis:100%} #diffWrap select{width:100%;background:#3a2a6a;border:1px solid #ffde59}
-#boardWrap{position:relative;background:#0a0d2a;border-radius:16px;padding:6px;overflow:hidden}
-#board{display:grid;grid-template-columns:repeat(10, minmax(0,1fr));gap:4px;width:100%}
-.cell{position:relative;background:#2a2f7a;border-radius:8px;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;transition:transform 0.2s}
-.cell b{font-size:11px;color:#fff}.cell small{font-size:6px;font-weight:800;padding:1px 4px;border-radius:8px;margin-top:2px}
-.cell.ladder{background:linear-gradient(145deg,#2e5a28,#244a1e);border:1px solid #69f0ae44}.cell.ladder small{background:#69f0ae;color:#0a2a12}
-.cell.snake{background:linear-gradient(145deg,#5a2a3a,#4a1a2a);border:1px solid #ff408144}.cell.snake small{background:#ff4081;color:#fff}
-.cell.active{outline:2.5px solid #ffde59;box-shadow:0 0 12px #ffde59;z-index:2}
-.cell.anim-up{animation:upAnim 1s ease 2}
-.cell.anim-down{animation:downAnim 1s ease 2}
-@keyframes upAnim{0%{transform:scale(1)}50%{transform:scale(1.15);box-shadow:0 0 20px #69f0ae;background:#3a7a35}100%{transform:scale(1)}}
-@keyframes downAnim{0%{transform:scale(1)}50%{transform:scale(1.15);box-shadow:0 0 20px #ff4081;background:#7a2a3a}100%{transform:scale(1)}}
-.pion{position:absolute;width:20px;height:20px;border-radius:50%;border:2.2px solid white;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:white;z-index:10;transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);left:50%;top:50%;pointer-events:none}
-.pion.active{transform:translate(-50%,-50%) scale(1.35) translateY(-6px);box-shadow:0 0 14px currentColor;border-color:#ffde59;z-index:12}
-.pion.kicked{animation:kick 0.6s ease forwards}
-@keyframes kick{0%{transform:translate(-50%,-50%) scale(1.3)}30%{transform:translate(-50%,-130%) scale(1.5) rotate(20deg)}100%{transform:translate(-50%,-50%) scale(0)}}
-#players{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:10px 0}
-.p-card{background:rgba(0,0,0,0.25);padding:6px 2px;border-radius:10px;text-align:center;border:2px solid transparent}
-.p-card.turn{border-color:#ffde59;background:rgba(255,222,89,0.15)}.p-card b{font-size:9px;color:white}.p-card span{font-size:8px;color:#aaa}
-#diceArea{display:flex;align-items:center;gap:10px;background:#24286a;border-radius:14px;padding:10px}
-#log{flex:1;color:#c2c6f0;font-size:10.5px;line-height:1.3}
-#dice{width:58px;height:58px;flex-shrink:0;background:white;border-radius:12px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:6px;gap:2px;box-shadow:0 4px 0 #999;cursor:pointer;position:relative}
-#dice.disabled{opacity:0.35;pointer-events:none;filter:grayscale(1);transform:translateY(3px)}
-#dice.bot-turn{opacity:0.35;pointer-events:none;filter:grayscale(1)} #dice.bot-turn::after{content:'BOT';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.65);color:#ffde59;font-size:10px;font-weight:900;border-radius:12px}
-#dice.rolling{animation:shake 0.08s infinite}
-@keyframes shake{0%{transform:rotate(-8deg) scale(1.08)}50%{transform:rotate(8deg) scale(1.08)}100%{transform:rotate(-8deg) scale(1.08)}}
-.pip{width:8px;height:8px;background:#222;border-radius:50%;opacity:0;margin:auto}.pip.on{opacity:1}
-#popup{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:none;justify-content:center;align-items:center;z-index:99;padding:16px} #popup.show{display:flex}
-.card{background:#1e2150;padding:22px;border-radius:20px;text-align:center;width:100%;max-width:300px}
-.btn{padding:10px 20px;background:linear-gradient(#ffde59,#ffb700);border:none;border-radius:22px;font-weight:800;box-shadow:0 4px 0 #b47f00;cursor:pointer;font-size:12px}
-#animLine{position:absolute;inset:6px;pointer-events:none;z-index:15;width:calc(100% - 12px);height:calc(100% - 12px)}
-@keyframes dashFlow{to{stroke-dashoffset:-28}}
-#menuBtn{display:none;background:#3a2a6a;border:1px solid #ffde59;color:#ffde59;padding:8px 14px;border-radius:12px;font-weight:800;font-size:11px;cursor:pointer}
-#menuBtn.show{display:block}
-#menuPopup{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:none;justify-content:center;align-items:center;z-index:100;padding:16px}
-#menuPopup.show{display:flex}
-.menu-card{background:#1e2150;padding:20px;border-radius:20px;text-align:center;width:100%;max-width:320px;border:2px solid #2c317a}
-.menu-card h2{color:#ffde59;margin-bottom:12px;font-size:16px}
-.menu-list{display:flex;flex-direction:column;gap:8px;margin:14px 0}
-.menu-list button{padding:12px;border:none;border-radius:12px;font-weight:700;font-size:12px;cursor:pointer}
-.m-primary{background:linear-gradient(#ffde59,#ffb700);color:#000;box-shadow:0 3px 0 #b47f00}
-.m-secondary{background:#2c317a;color:white}
-.m-danger{background:#5a2a3a;color:#ff8daa;border:1px solid #ff408144}
-footer{margin-top:10px;text-align:center;color:#6b6faa;font-size:9px;line-height:1.4}
-footer b{color:#ffde59}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Fredoka',sans-serif}
+body{background:#0f1020;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:10px}
+h1{margin:10px 0;font-size:22px}
+.card{background:#1e203a;padding:16px;border-radius:18px;width:100%;max-width:420px;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+.btn{width:100%;padding:12px;border:none;border-radius:12px;font-weight:700;font-size:16px;cursor:pointer;margin:6px 0;transition:.2s}
+.btn:active{transform:scale(.97)}
+.btn-host{background:linear-gradient(#00e5ff,#2979ff);color:#fff}
+.btn-join{background:linear-gradient(#69f0ae,#00c853);color:#000}
+.btn-dice{background:#fff;color:#000;font-size:20px;padding:18px;margin-top:10px}
+.btn:disabled{opacity:.4;pointer-events:none}
+input{width:100%;padding:12px;border-radius:12px;border:2px solid #2a2d5a;background:#12132a;color:#fff;font-size:16px;margin:6px 0;text-align:center;letter-spacing:2px}
+#board{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin:12px 0;background:#151632;padding:6px;border-radius:12px}
+.cell{aspect-ratio:1;background:#23254f;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;position:relative;font-weight:600}
+.cell.ladder{background:#1b4d3a}.cell.snake{background:#5a1a2a}
+.cell b{font-size:11px}.cell small{font-size:8px;opacity:.7}
+.pion{position:absolute;width:18px;height:18px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:10px;bottom:2px;left:50%;transform:translateX(-50%);z-index:2;transition:.3s}
+.log{background:#12132a;padding:10px;border-radius:10px;margin:8px 0;text-align:center;font-size:14px;min-height:40px}
+.players{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.p-card{background:#2a2d5a;padding:6px 10px;border-radius:10px;font-size:12px;text-align:center;min-width:70px}
+.p-card.turn{outline:2px solid #ffde59;transform:scale(1.05)}
+.room-code{font-size:28px;letter-spacing:4px;background:#000;padding:10px;border-radius:10px;margin:10px 0;text-align:center;font-weight:800;color:#00e5ff}
+.hide{display:none!important}
 </style>
 </head>
 <body>
-<div id="wrap">
-<h1>🐍 <span>ULAR TANGGA LUCKY</span> 🪜</h1>
-<div class="top" id="top">
-<select id="pCount"><option value="2">2 Pemain</option><option value="3">3 Pemain</option><option value="4" selected>4 Pemain</option></select>
-<select id="mode"><option value="mix">Manusia + BOT</option><option value="human">Manusia vs Manusia</option><option value="bot">BOT vs BOT</option></select>
-<div id="diffWrap"><select id="diff"><option value="easy">😊 Mudah - Lucky Manusia</option><option value="normal" selected>😐 Normal - 50:50</option><option value="hard">😈 Sulit - BOT Lucky</option></select></div>
-<button class="btn" onclick="startGame()">MULAI</button>
-</div>
-<div id="boardWrap"><div id="board"></div><svg id="animLine"></svg></div>
-<div id="players"></div>
-<div id="diceArea"><div id="log">Pilih mode!</div><button id="menuBtn" onclick="openMenu()">MENU</button><div id="dice" onclick="humanRoll()"><div class="pip" id="p1"></div><div class="pip" id="p2"></div><div class="pip" id="p3"></div><div class="pip" id="p4"></div><div class="pip" id="p5"></div><div class="pip" id="p6"></div><div class="pip" id="p7"></div><div class="pip" id="p8"></div><div class="pip" id="p9"></div></div></div>
-<footer>
-  <b>Ular Tangga Lucky v1.3.0</b> • PWA Offline<br>
-  Dibuat oleh <b>Aril & Ai kesayangan</b> • 2026
-</footer>
+<h1>🐍 ULAR TANGGA MABAR 🪜</h1>
+
+<div id="lobby" class="card">
+  <input id="playerName" placeholder="Nama Kamu" maxlength="10" value="Player">
+  <button class="btn btn-host" onclick="createRoom()">📡 BUAT ROOM (Jadi Host Hotspot)</button>
+  <div style="text-align:center;margin:8px;opacity:.5">- ATAU -</div>
+  <input id="joinCode" placeholder="KODE ROOM">
+  <button class="btn btn-join" onclick="joinRoom()">🚀 GABUNG ROOM</button>
+  <p style="font-size:11px;opacity:.6;margin-top:10px;text-align:center">Tips: Host nyalakan hotspot dulu. Semua connect ke hotspot yang sama. Ga perlu internet!</p>
 </div>
 
-<div id="popup"><div class="card"><div style="font-size:50px">🏆</div><h2 id="winTitle" style="color:#ffde59">MENANG!</h2><p id="winDesc" style="color:#aaa;font-size:11px;margin-top:8px"></p><button class="btn" onclick="doExit()">MAIN LAGI</button></div></div>
-
-<div id="menuPopup"><div class="menu-card">
-<h2>MENU</h2>
-<p id="menuInfo" style="color:#aaa;font-size:10px"></p>
-<div class="menu-list">
-<button class="m-primary" onclick="closeMenu()">▶️ Lanjut Main</button>
-<button class="m-secondary" onclick="restartSame()">🔄 Ulang</button>
-<button class="m-danger" onclick="doExit()">🏠 Keluar</button>
+<div id="room" class="card hide">
+  <div>Kode Room Kamu:</div>
+  <div id="myCode" class="room-code">----</div>
+  <div id="playerList" class="players"></div>
+  <div id="roomLog" class="log">Menunggu pemain lain...</div>
+  <button id="startBtn" class="btn btn-host hide" onclick="hostStartGame()">START GAME ▶️</button>
 </div>
-<p style="color:#6b6faa;font-size:8px;margin-top:8px">Tutup tab untuk keluar paksa</p>
-</div></div>
+
+<div id="game" class="card hide" style="max-width:500px">
+  <div id="gamePlayers" class="players"></div>
+  <div id="gameLog" class="log">Giliran...</div>
+  <div id="board"></div>
+  <button id="diceBtn" class="btn btn-dice" onclick="rollDiceMabar()">🎲 LEMPAR DADU</button>
+  <div id="diceResult" style="text-align:center;font-size:40px;margin:6px">⚪</div>
+</div>
 
 <script>
-// NUKLIR - HAPUS SEMUA SW & CACHE LAMA
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(regs => {
-    for (let reg of regs) {
-      reg.unregister().then(() => console.log('SW lama di-unregister'));
-    }
+// === CONFIG ===
+let SNAKES={97:78,95:24,92:84,62:37,48:12,35:6,16:4};
+let LADDERS={3:22,8:26,21:42,28:77,52:68,72:90,80:98};
+const COLORS=['#00e5ff','#ff4081','#ffde59','#69f0ae'];
+let peer=null, conn=[], isHost=false, myId='', roomId='', myName='';
+let players=[], turn=0, playing=false, moving=false;
+let boardEl=document.getElementById('board');
+
+// === LOBBY ===
+function createRoom(){
+  myName=document.getElementById('playerName').value||'Host';
+  isHost=true;
+  roomId=Math.random().toString(36).substring(2,6).toUpperCase();
+  peer=new Peer('ular-'+roomId);
+  peer.on('open', id=>{
+    myId=id;
+    document.getElementById('lobby').classList.add('hide');
+    document.getElementById('room').classList.remove('hide');
+    document.getElementById('myCode').textContent=roomId;
+    document.getElementById('startBtn').classList.remove('hide');
+    players=[{id:myId,name:myName,pos:0,color:COLORS[0],isHost:true}];
+    renderLobby();
   });
-  if (window.caches) {
-    caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+  peer.on('connection', c=>{
+    conn.push(c);
+    c.on('open', ()=>{ c.send({type:'welcome', players, roomId}); });
+    c.on('data', handleData);
+  });
+}
+
+function joinRoom(){
+  myName=document.getElementById('playerName').value||'Player';
+  let code=document.getElementById('joinCode').value.toUpperCase();
+  if(!code) return alert('Masukan kode room!');
+  roomId=code;
+  peer=new Peer();
+  peer.on('open', id=>{
+    myId=id;
+    let c=peer.connect('ular-'+roomId);
+    conn=[c];
+    c.on('open', ()=>c.send({type:'join', name:myName, id:myId}));
+    c.on('data', handleData);
+    document.getElementById('lobby').classList.add('hide');
+    document.getElementById('room').classList.remove('hide');
+    document.getElementById('myCode').textContent=roomId;
+  });
+}
+
+function renderLobby(){
+  document.getElementById('playerList').innerHTML=players.map(p=>`<div class="p-card" style="border-top:3px solid ${p.color}">${p.name}${p.isHost?' 👑':''}<br>${p.pos}</div>`).join('');
+  document.getElementById('roomLog').textContent=`${players.length}/4 Pemain - ${isHost?'Kamu Host':'Menunggu host start'}`;
+  if(isHost) broadcast({type:'updatePlayers', players});
+}
+
+function handleData(data){
+  if(data.type==='welcome'){ players=data.players; renderLobby(); }
+  if(data.type==='join'){
+    if(isHost){
+      players.push({id:data.id,name:data.name,pos:0,color:COLORS[players.length%4],isHost:false});
+      renderLobby();
+    }
   }
-  // jangan register dulu pas dev
-  // navigator.serviceWorker.register('sw.js') 
+  if(data.type==='updatePlayers'){ players=data.players; renderLobby(); }
+  if(data.type==='startGame'){ startGameClient(data); }
+  if(data.type==='roll'){ movePlayer(data.id, data.dice); }
+  if(data.type==='sync'){ players=data.players; turn=data.turn; renderGame(); }
+}
+
+function broadcast(d){ conn.forEach(c=>c.open&&c.send(d)); }
+
+// === GAME LOGIC MABAR ===
+function hostStartGame(){
+  if(players.length<2) return alert('Minimal 2 pemain!');
+  broadcast({type:'startGame', players, turn:0});
+  startGameClient({players, turn:0});
+}
+function startGameClient(data){
+  players=data.players; turn=data.turn||0; playing=true;
+  document.getElementById('room').classList.add('hide');
+  document.getElementById('game').classList.remove('hide');
+  createBoard(); renderGame();
+}
+
+function createBoard(){
+  boardEl.innerHTML='';
+  for(let row=0; row<10; row++){
+    for(let col=0; col<10; col++){
+      let r=row; let base=100-r*10; let n=r%2===0? base-col : base-9+col;
+      let d=document.createElement('div'); d.className='cell'; d.id='c'+n;
+      if(LADDERS[n]) d.classList.add('ladder');
+      if(SNAKES[n]) d.classList.add('snake');
+      let lbl=LADDERS[n]?`↑${LADDERS[n]}`:SNAKES[n]?`↓${SNAKES[n]}`:'';
+      d.innerHTML=`<b>${n}</b><small>${lbl}</small>`; boardEl.appendChild(d);
+    }
+  }
+}
+
+function renderGame(){
+  document.getElementById('gamePlayers').innerHTML=players.map((p,i)=>`<div class="p-card ${i===turn?'turn':''}" style="border-top:3px solid ${p.color}">${p.name}<br>${p.pos===0?'START':p.pos}${i===turn?' ⏳':''}</div>`).join('');
+  document.querySelectorAll('.pion').forEach(e=>e.remove());
+  players.forEach(p=>{
+    if(p.pos===0) return;
+    let cell=document.getElementById('c'+p.pos); if(!cell) return;
+    let pion=document.createElement('div'); pion.className='pion'; pion.style.background=p.color; pion.textContent=p.name[0]; cell.appendChild(pion);
+  });
+  let cur=players[turn];
+  let isMyTurn=cur&&cur.id===myId;
+  document.getElementById('gameLog').innerHTML=isMyTurn?`Giliran Kamu <b style="color:${cur.color}">${cur.name}</b>! Lempar dadu!`:`Giliran <b style="color:${cur.color}">${cur.name}</b>`;
+  document.getElementById('diceBtn').disabled=!isMyTurn||moving;
+}
+
+function rollDiceMabar(){
+  if(moving) return;
+  let cur=players[turn]; if(cur.id!==myId) return;
+  let d=Math.floor(Math.random()*6)+1;
+  document.getElementById('diceResult').textContent=['','⚀','⚁','⚂','⚃','⚄','⚅'][d];
+  if(isHost){
+    movePlayer(myId,d);
+    broadcast({type:'roll', id:myId, dice:d});
+  } else {
+    conn[0].send({type:'roll', id:myId, dice:d});
+    movePlayer(myId,d);
+  }
+}
+
+function movePlayer(id,dice){
+  moving=true;
+  let p=players.find(x=>x.id===id);
+  let target=p.pos===0?dice:p.pos+dice;
+  if(target>100){ moving=false; document.getElementById('gameLog').textContent=`Butuh ${100-p.pos} pas!`; nextTurnMabar(); return; }
+  let cur=p.pos===0?0:p.pos;
+  let it=setInterval(()=>{
+    if(cur<target){ cur++; p.pos=cur; renderGame(); }
+    else {
+      clearInterval(it);
+      if(LADDERS[p.pos]){ document.getElementById('gameLog').textContent=`🪜 TANGGA ${p.name} ${p.pos}→${LADDERS[p.pos]}`; p.pos=LADDERS[p.pos]; }
+      if(SNAKES[p.pos]){ document.getElementById('gameLog').textContent=`🐍 ULAR ${p.name} ${p.pos}→${SNAKES[p.pos]}`; p.pos=SNAKES[p.pos]; }
+      setTimeout(()=>{ renderGame(); if(p.pos===100){ document.getElementById('gameLog').textContent=`🏆 ${p.name} MENANG!`; playing=false; } else nextTurnMabar(); moving=false; },400);
+    }
+  },150);
+}
+
+function nextTurnMabar(){
+  turn=(turn+1)%players.length;
+  if(isHost) broadcast({type:'sync', players, turn});
+  renderGame();
 }
 </script>
 
 <script>
-// ===== ANTI RELOAD KECUALI TUTUP TAB / KELUAR =====
-let allowExit = false;
-function doExit(){ allowExit = true; location.reload(); }
-
-// cegah F5, Ctrl+R, Ctrl+Shift+R
-document.addEventListener('keydown', function(e){
-  if(e.key === 'F5' || ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'r'))){
-    e.preventDefault(); e.stopPropagation(); return false;
-  }
-});
-
-// cegah pull to refresh di Android
-let lastTouchY = 0;
-document.addEventListener('touchstart', e=>{ lastTouchY = e.touches[0].clientY; }, {passive:false});
-document.addEventListener('touchmove', e=>{
-  let curY = e.touches[0].clientY;
-  if(window.scrollY===0 && curY > lastTouchY + 10){ e.preventDefault(); }
-}, {passive:false});
-
-// konfirmasi kalau mau reload / tutup tab pas lagi main
-window.addEventListener('beforeunload', function(e){
-  if(!allowExit && playing){
-    e.preventDefault();
-    e.returnValue = 'Game masih berjalan! Yakin mau keluar? Progress akan hilang.';
-    return e.returnValue;
-  }
-});
-// cegah klik kanan reload
-document.addEventListener('contextmenu', e=> e.preventDefault());
-
-const SNAKES={97:78,95:24,92:84,62:37,48:12,35:6,16:4};
-const LADDERS={3:22,8:26,21:42,28:77,52:68,72:90,80:98};
-const COLORS=['#00e5ff','#ff4081','#ffde59','#69f0ae'], NAMES=['Biru','Merah','Kuning','Hijau'];
-let boardEl=document.getElementById('board'), players=[], turn=0, playing=false, moving=false, audioCtx, sixStreak=0, gameMode='mix', difficulty='normal', bossBotId=0;
-function initAudio(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }
-function tone(f,d,t='sine',v=0.2,s=0){ initAudio(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type=t; o.frequency.setValueAtTime(f,audioCtx.currentTime); if(s) o.frequency.linearRampToValueAtTime(f+s,audioCtx.currentTime+d); g.gain.setValueAtTime(v,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+d); o.start(); o.stop(audioCtx.currentTime+d); }
-function sfx(k){
- if(k==='dice'){ tone(180,0.12,'square',0.22); setTimeout(()=>tone(420,0.1,'sine',0.18),70);}
- if(k==='step') tone(480+Math.random()*200,0.1,'sine',0.13,60);
- if(k==='ladder'){ tone(300,0.13,'sine',0.22); setTimeout(()=>tone(520,0.13,'sine',0.22),100); setTimeout(()=>tone(880,0.26,'sine',0.28),210);}
- if(k==='snake'){ tone(680,0.12,'sawtooth',0.2,-350); setTimeout(()=>tone(260,0.26,'sawtooth',0.2),120);}
- if(k==='win'){ tone(400,0.16,'sine',0.28,80); setTimeout(()=>tone(600,0.16,'sine',0.28,80),140); setTimeout(()=>tone(900,0.45,'sine',0.32),280);}
- if(k==='bust'){ tone(150,0.4,'sawtooth',0.25);}
- if(k==='kick'){ tone(800,0.08,'square',0.3); setTimeout(()=>tone(120,0.35,'sawtooth',0.35,-100),80); }
- if(k==='no'){ tone(100,0.2,'square',0.15); }
-}
-const diceMap={1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]};
-function showDice(n){ for(let i=1;i<=9;i++) document.getElementById('p'+i).classList.remove('on'); (diceMap[n]||[]).forEach(i=>document.getElementById('p'+i).classList.add('on')); }
-function createBoard(){
- boardEl.innerHTML='';
- for(let row=0; row<10; row++){
-  for(let col=0; col<10; col++){
-   let r=row; let base=100-r*10; let n; if(r%2===0){ n=base-col; } else { n=base-9+col; }
-   let d=document.createElement('div'); d.className='cell'; d.id='c'+n;
-   let lbl=''; if(LADDERS[n]){ d.classList.add('ladder'); lbl=`<small>↑${LADDERS[n]}</small>`; } if(SNAKES[n]){ d.classList.add('snake'); lbl=`<small>↓${SNAKES[n]}</small>`; }
-   d.innerHTML=`<b>${n}</b>${lbl}`; boardEl.appendChild(d);
-  }
- }
-}
-let playersEl=document.getElementById('players'), logEl=document.getElementById('log'), diceEl=document.getElementById('dice');
-function openMenu(){
- document.getElementById('menuInfo').textContent = `Mode: ${gameMode} [${difficulty}]`;
- document.getElementById('menuPopup').classList.add('show');
-}
-function closeMenu(){ document.getElementById('menuPopup').classList.remove('show'); }
-function restartSame(){ closeMenu(); startGame(); }
-function startGame(){
- createBoard();
- let c=+document.getElementById('pCount').value; gameMode=document.getElementById('mode').value; difficulty=document.getElementById('diff').value;
- players=[]; for(let i=0;i<c;i++){ let type; if(gameMode==='human') type='human'; else if(gameMode==='bot') type='bot'; else type=(i===0?'human':'bot'); players.push({id:i,name:NAMES[i],color:COLORS[i],type,pos:1,win:false}); }
- bossBotId=Math.floor(Math.random()*players.length);
- turn=0; playing=true; sixStreak=0; moving=false;
- document.getElementById('top').style.display='none';
- document.getElementById('menuBtn').classList.add('show');
- render(); place(); showDice(1); updateLock();
- if(players[turn].type==='bot') setTimeout(botRoll,900);
-}
-function updateLock(){
- diceEl.classList.remove('disabled','bot-turn');
- if(!playing || moving){ diceEl.classList.add('disabled'); return; }
- let cur=players[turn];
- if(cur.type==='bot'){ diceEl.classList.add('bot-turn'); logEl.innerHTML=`🤖 ${cur.name} BOT [${difficulty}]`; }
- else { logEl.innerHTML=`🎲 Giliran <b style="color:${cur.color}">${cur.name}</b> [${difficulty}]`; }
- if(gameMode==='bot'){ diceEl.classList.add('disabled','bot-turn'); logEl.innerHTML=`🤖 BOT vs BOT [${difficulty}]`; }
-}
-function render(){ playersEl.innerHTML=''; players.forEach((p,i)=>{ let d=document.createElement('div'); d.className='p-card'+(i===turn?' turn':''); d.innerHTML=`<div style="width:10px;height:10px;border-radius:50%;background:${p.color};margin:0 auto 2px;border:1.5px solid white"></div><b>${p.name}${p.type==='bot'?' 🤖':''}${p.id===bossBotId&&difficulty!=='normal'&&gameMode==='bot'?' 👑':''}</b><br><span>${p.pos}</span>`; playersEl.appendChild(d); }); document.querySelectorAll('.cell').forEach(c=>c.classList.remove('active')); let cur=document.getElementById('c'+players[turn].pos); if(cur) cur.classList.add('active'); }
-function place(){
- document.querySelectorAll('.pion').forEach(e=>e.remove());
- let g={}; players.forEach(p=>{if(!g[p.pos]) g[p.pos]=[]; g[p.pos].push(p);});
- Object.keys(g).forEach(pos=>{
-  let cell=document.getElementById('c'+pos); if(!cell) return;
-  g[pos].forEach((p,idx)=>{
-   let pion=document.createElement('div'); pion.className='pion'+(players[turn].id===p.id?' active':''); pion.id='pion-'+p.id; pion.style.background=p.color; pion.textContent=p.id+1;
-   let offsets=[{x:-8,y:-8},{x:8,y:-8},{x:-8,y:8},{x:8,y:8}]; let off=offsets[idx%4];
-   pion.style.transform=`translate(calc(-50% + ${off.x}px), calc(-50% + ${off.y}px))`;
-   if(players[turn].id===p.id){ pion.style.transform=`translate(calc(-50% + ${off.x}px), calc(-50% + ${off.y-6}px)) scale(1.35)`; }
-   cell.appendChild(pion);
+// === PWA OFFLINE MABAR ===
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw-mabar.js');
   });
- });
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
 }
-function rollByChance(table){ let r=Math.random(), sum=0; for(let [val,prob] of table){ sum+=prob; if(r<=sum) return val; } return table[table.length-1][0]; }
-function getDiceForPlayer(p){
- if(gameMode==='human') return Math.floor(Math.random()*6)+1;
- if(p.type==='human'){
-  if(difficulty==='easy'){ return rollByChance([[6,0.45],[5,0.40],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); }
-  if(difficulty==='hard'){ return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); }
-  return Math.floor(Math.random()*6)+1;
- }
- if(gameMode==='bot'){
-  if(difficulty==='easy'){
-   if(p.id===bossBotId){ return rollByChance([[6,0.45],[5,0.40],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); } else { return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); }
-  }
-  if(difficulty==='hard'){
-   if(p.id===bossBotId){ return rollByChance([[6,0.50],[5,0.35],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); } else { return rollByChance([[1,0.50],[2,0.35],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); }
-  }
-  return Math.floor(Math.random()*6)+1;
- }
- if(difficulty==='easy'){ return rollByChance([[1,0.45],[2,0.40],[3,0.10],[4,0.03],[5,0.01],[6,0.01]]); }
- if(difficulty==='hard'){ return rollByChance([[6,0.50],[5,0.35],[4,0.10],[3,0.03],[2,0.01],[1,0.01]]); }
- return Math.floor(Math.random()*6)+1;
-}
-function getDice(){ let d=getDiceForPlayer(players[turn]); if(d===6) sixStreak++; else sixStreak=0; if(sixStreak>=3){ d=Math.floor(Math.random()*5)+1; sixStreak=0; } return d; }
-function humanRoll(){ if(!playing || moving) return; if(players[turn].type==='bot'){ sfx('no'); return; } doRoll(); }
-function botRoll(){ if(!playing || moving) return; if(players[turn].type!=='bot') return; doRoll(); }
-function doRoll(){
- moving=true; diceEl.classList.add('disabled','rolling'); sfx('dice');
- let r=0, iv=setInterval(()=>{ showDice(Math.floor(Math.random()*6)+1); if(++r>12){ clearInterval(iv); diceEl.classList.remove('rolling'); let d=getDice(); showDice(d); moveStep(players[turn],d); } },70);
-}
-function drawLine(from,to,color){
- let svg=document.getElementById('animLine'); svg.innerHTML='';
- let fromEl=document.getElementById('c'+from), toEl=document.getElementById('c'+to);
- if(!fromEl||!toEl) return;
- let wrap=document.getElementById('boardWrap').getBoundingClientRect();
- let f=fromEl.getBoundingClientRect(), t=toEl.getBoundingClientRect();
- let x1=f.left + f.width/2 - wrap.left; let y1=f.top + f.height/2 - wrap.top;
- let x2=t.left + t.width/2 - wrap.left; let y2=t.top + t.height/2 - wrap.top;
- let line=document.createElementNS('http://www.w3.org/2000/svg','line');
- line.setAttribute('x1',x1); line.setAttribute('y1',y1); line.setAttribute('x2',x2); line.setAttribute('y2',y2);
- line.setAttribute('stroke',color); line.setAttribute('stroke-width','5'); line.setAttribute('stroke-linecap','round'); line.setAttribute('stroke-dasharray','10 8');
- line.style.animation='dashFlow 0.4s linear infinite'; line.style.filter=`drop-shadow(0 0 6px ${color})`;
- svg.appendChild(line); setTimeout(()=>{ svg.innerHTML=''; },1300);
-}
-function moveStep(p,steps){
- let target=p.pos+steps;
- if(target>100){
-  let over=target-100; let bounce=100-over;
-  logEl.innerHTML=`Lewat 100! ${p.pos}+${steps}=${target} → mantul ${bounce}`; sfx('bust');
-  let cur=p.pos; let up=setInterval(()=>{ if(cur<100){ cur++; p.pos=cur; render(); place(); sfx('step'); } else{ clearInterval(up); setTimeout(()=>{ let down=setInterval(()=>{ if(p.pos>bounce){ p.pos--; render(); place(); sfx('step'); } else{ clearInterval(down); if(SNAKES[p.pos] || LADDERS[p.pos]){ handleSnakeLadder(p); } else { finishAfterMove(p); } } },180); },250); } },180); return;
- }
- logEl.innerHTML=`${p.name} dapat ${steps} → ${target}`;
- let cur=p.pos; let it=setInterval(()=>{ if(cur<target){ cur++; p.pos=cur; render(); place(); sfx('step'); } else{ clearInterval(it); handleSnakeLadder(p); } },190);
-}
-function handleSnakeLadder(p){
- if(LADDERS[p.pos]){
-  let to=LADDERS[p.pos]; logEl.innerHTML=`🪜 TANGGA! ${p.pos} → ${to} ⬆️`; sfx('ladder');
-  let from=document.getElementById('c'+p.pos); if(from) from.classList.add('anim-up');
-  drawLine(p.pos,to,'#69f0ae');
-  setTimeout(()=>{ p.pos=to; render(); place(); let dest=document.getElementById('c'+to); if(dest) dest.classList.add('anim-up'); setTimeout(()=>checkKick(p),500); },700);
- } else if(SNAKES[p.pos]){
-  let to=SNAKES[p.pos]; logEl.innerHTML=`🐍 ULAR! ${p.pos} → ${to} ⬇️`; sfx('snake');
-  let from=document.getElementById('c'+p.pos); if(from) from.classList.add('anim-down');
-  drawLine(p.pos,to,'#ff4081');
-  setTimeout(()=>{ p.pos=to; render(); place(); let dest=document.getElementById('c'+to); if(dest) dest.classList.add('anim-down'); setTimeout(()=>checkKick(p),500); },700);
- } else { checkKick(p); }
-}
-function checkKick(p){
- let victims=players.filter(o=> o.id!==p.id && o.pos===p.pos && o.pos!==1 && o.pos!==100);
- if(victims.length>0){
-  victims.forEach(v=>{ sfx('kick'); let vp=document.getElementById('pion-'+v.id); if(vp) vp.classList.add('kicked'); });
-  logEl.innerHTML=`💥 ${p.name} NENDANG ${victims.map(v=>v.name).join(',')}!`;
-  setTimeout(()=>{ victims.forEach(v=>v.pos=1); render(); place(); finishAfterMove(p); },600);
- } else { finishAfterMove(p); }
-}
-function finishAfterMove(p){
- if(p.pos===100){ p.win=true; sfx('win'); document.getElementById('winTitle').textContent=p.name+' MENANG!'; document.getElementById('winDesc').textContent=`Mode ${gameMode} [${difficulty}]`; document.getElementById('popup').classList.add('show'); playing=false; moving=false; diceEl.classList.add('disabled'); return; }
- let isSix=document.querySelectorAll('.pip.on').length===6;
- if(isSix){ moving=false; logEl.innerHTML=`🎉 Dapat 6! ${p.name} lempar lagi!`; updateLock(); if(p.type==='bot') setTimeout(botRoll,900); }
- else { sixStreak=0; nextTurn(); }
-}
-function nextTurn(){ turn=(turn+1)%players.length; while(players[turn].win) turn=(turn+1)%players.length; render(); place(); moving=false; updateLock(); if(players[turn].type==='bot') setTimeout(botRoll,1100); }
-createBoard(); showDice(1); updateLock();
 </script>
 </body>
 </html>
