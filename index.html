@@ -219,7 +219,7 @@ function nextTurnMabar(){
 // === PWA OFFLINE MABAR ===
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw-mabar.js');
+    navigator.serviceWorker.register('./sw.js');
   });
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
