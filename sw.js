@@ -1,8 +1,10 @@
 // Service Worker - Ular MABAR Hotspot v1.0.0 - Full Offline PWA
-const CACHE = "ular-mabar-v1.0.0";
+const CACHE = "ular-mabar-v1.0.2";
 const ASSETS = [
   "./",
   "./index.html",
+  "./style.css",
+  "./main.js",
   "./site.webmanifest",
   "./web-app-manifest-192x192.png",
   "./web-app-manifest-512x512.png",
@@ -57,7 +59,7 @@ self.addEventListener("fetch", e => {
           caches.open(CACHE).then(c => c.put(e.request, res.clone()));
         }
         return res;
-      }).catch(() => caches.match("./mabar.html"))
+      }).catch(() => caches.match("./index.html"))
     )
   );
 });

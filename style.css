@@ -1,0 +1,23 @@
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Fredoka',sans-serif}
+body{background:#0f1020;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:10px}
+h1{margin:10px 0;font-size:22px}
+.card{background:#1e203a;padding:16px;border-radius:18px;width:100%;max-width:420px;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+.btn{width:100%;padding:12px;border:none;border-radius:12px;font-weight:700;font-size:16px;cursor:pointer;margin:6px 0;transition:.2s}
+.btn:active{transform:scale(.97)}
+.btn-host{background:linear-gradient(#00e5ff,#2979ff);color:#fff}
+.btn-join{background:linear-gradient(#69f0ae,#00c853);color:#000}
+.btn-dice{background:#fff;color:#000;font-size:20px;padding:18px;margin-top:10px}
+.btn:disabled{opacity:.4;pointer-events:none}
+input{width:100%;padding:12px;border-radius:12px;border:2px solid #2a2d5a;background:#12132a;color:#fff;font-size:16px;margin:6px 0;text-align:center;letter-spacing:2px}
+#board{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin:12px 0;background:#151632;padding:6px;border-radius:12px}
+.cell{aspect-ratio:1;background:#23254f;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;position:relative;font-weight:600}
+.cell.ladder{background:#1b4d3a}.cell.snake{background:#5a1a2a}
+.cell b{font-size:11px}.cell small{font-size:8px;opacity:.7}
+.pion{position:absolute;width:18px;height:18px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:10px;bottom:2px;left:50%;transform:translateX(-50%);z-index:2;transition:.3s}
+.log{background:#12132a;padding:10px;border-radius:10px;margin:8px 0;text-align:center;font-size:14px;min-height:40px}
+.players{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.p-card{background:#2a2d5a;padding:6px 10px;border-radius:10px;font-size:12px;text-align:center;min-width:70px}
+.p-card.turn{outline:2px solid #ffde59;transform:scale(1.05)}
+.room-code{font-size:28px;letter-spacing:4px;background:#000;padding:10px;border-radius:10px;margin:10px 0;text-align:center;font-weight:800;color:#00e5ff}
+.hide{display:none!important}
