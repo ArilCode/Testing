@@ -1,5 +1,5 @@
-// Service Worker - v5.0.3 - OFFLINE FIRST INSTALL
-const CACHE = "blockyBlast-v5.0.3";
+// Service Worker - v5.0.4 - OFFLINE FIRST INSTALL
+const CACHE = "blockyBlast-v5.0.4";
 const ASSETS = [
   "./",
   "./index.html",
