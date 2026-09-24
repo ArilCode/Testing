@@ -1,65 +1,58 @@
-// Service Worker - Ular MABAR Hotspot v1.0.0 - Full Offline PWA
-const CACHE = "ular-mabar-v1.0.2";
+// Service Worker - v5.0.3 - OFFLINE FIRST INSTALL
+const CACHE = "blockyBlast-v5.0.3";
 const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   "./main.js",
   "./site.webmanifest",
-  "./web-app-manifest-192x192.png",
-  "./web-app-manifest-512x512.png",
-  "./apple-touch-icon.png",
-  "./favicon-96x96.png",
-  "./favicon.ico",
-  "./favicon.svg",
-  "https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap",
-  "https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"
+  "./image/favicon-96x96.png",
+  "./image/favicon.svg",
+  "./image/favicon.ico",
+  "./image/web-app-manifest-192x192.png",
+  "./image/web-app-manifest-512x512.png",
+  "./image/apple-touch-icon.png",
+  // TAMBAHKAN LANGSUNG URL FONT KAMU BIAR KE-DOWNLOAD PAS INSTALL
+  "https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap"
 ];
 
 self.addEventListener("install", e => {
+  console.log("[SW] Install - download cache langsung");
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS)).catch(() => {})
+    caches.open(CACHE).then(c => c.addAll(ASSETS))
+    .then(() => self.skipWaiting()) // langsung aktif, gak nunggu tab ditutup
   );
-  self.skipWaiting();
 });
 
 self.addEventListener("activate", e => {
   e.waitUntil(
     caches.keys().then(k =>
       Promise.all(k.filter(x => x !== CACHE).map(x => caches.delete(x)))
-    ).then(() => self.clients.claim())
+    ).then(() => self.clients.claim()) // langsung ambil alih semua tab
   );
 });
 
 self.addEventListener("fetch", e => {
-  const url = e.request.url;
+  // Abaikan request non-GET
+  if (e.request.method !== 'GET') return;
   
-  // PeerJS & Google Fonts - Cache First
-  if (url.includes("fonts.googleapis") || url.includes("fonts.gstatic") || url.includes("peerjs") || url.includes("unpkg.com")) {
-    e.respondWith(
-      caches.open(CACHE).then(async cache => {
-        const hit = await cache.match(e.request);
-        if (hit) return hit;
-        try {
-          const res = await fetch(e.request);
-          if (res.ok) cache.put(e.request, res.clone());
-          return res;
-        } catch { return hit; }
-      })
-    );
-    return;
-  }
-  
-  // Default: Cache First, fallback to network, then to mabar.html
   e.respondWith(
-    caches.match(e.request).then(r =>
-      r || fetch(e.request).then(res => {
-        // Cache new assets on the fly
-        if (res.ok && e.request.method === 'GET' && url.startsWith(self.location.origin)) {
-          caches.open(CACHE).then(c => c.put(e.request, res.clone()));
-        }
+    caches.match(e.request).then(cached => {
+      if (cached) return cached; // kalau ada di cache, langsung kasih
+      
+      // kalau gak ada, fetch + simpan
+      return fetch(e.request).then(res => {
+        // hanya cache yang ok
+        if (!res || res.status !== 200) return res;
+        const resClone = res.clone();
+        caches.open(CACHE).then(cache => cache.put(e.request, resClone));
         return res;
-      }).catch(() => caches.match("./index.html"))
-    )
+      }).catch(() => {
+        // kalau offline dan gak ada di cache, balikin index.html (untuk navigasi)
+        if (e.request.mode === 'navigate') {
+          return caches.match("./index.html");
+        }
+      });
+    })
   );
 });

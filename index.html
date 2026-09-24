@@ -2,57 +2,129 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<link rel="icon" type="image/png" href="./favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-<link rel="shortcut icon" href="./favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="Aril Game" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<link rel="icon" type="image/png" href="./image/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="./image/favicon.svg" />
+<link rel="shortcut icon" href="./image/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="./image/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Block Blast" />
 <link rel="manifest" href="./site.webmanifest" />
-<title>Ular Tangga MABAR Hotspot</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<title>Block Blast - No Over</title>
+<meta name="theme-color" content="#1a1a2e">
 <link rel="stylesheet" href="./style.css">
-</head>
-<body>
-<h1>🐍 ULAR TANGGA MABAR 🪜</h1>
-
-<div id="lobby" class="card">
-  <input id="playerName" placeholder="Nama Kamu" maxlength="10" value="Player">
-  <button class="btn btn-host" onclick="createRoom()">📡 BUAT ROOM (Jadi Host Hotspot)</button>
-  <div style="text-align:center;margin:8px;opacity:.5">- ATAU -</div>
-  <input id="joinCode" placeholder="KODE ROOM">
-  <button class="btn btn-join" onclick="joinRoom()">🚀 GABUNG ROOM</button>
-  <p style="font-size:11px;opacity:.6;margin-top:10px;text-align:center">Tips: Host nyalakan hotspot dulu. Semua connect ke hotspot yang sama. Ga perlu internet!</p>
-</div>
-
-<div id="room" class="card hide">
-  <div>Kode Room Kamu:</div>
-  <div id="myCode" class="room-code">----</div>
-  <div id="playerList" class="players"></div>
-  <div id="roomLog" class="log">Menunggu pemain lain...</div>
-  <button id="startBtn" class="btn btn-host hide" onclick="hostStartGame()">START GAME ▶️</button>
-</div>
-
-<div id="game" class="card hide" style="max-width:500px">
-  <div id="gamePlayers" class="players"></div>
-  <div id="gameLog" class="log">Giliran...</div>
-  <div id="board"></div>
-  <button id="diceBtn" class="btn btn-dice" onclick="rollDiceMabar()">🎲 LEMPAR DADU</button>
-  <div id="diceResult" style="text-align:center;font-size:40px;margin:6px">⚪</div>
-</div>
-
-<script src="./main.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
-  // PWA - v2.0.2 Offline Ready
+// === SCRIPT KHUSUS BLOCK BLAST ===
+let touchStartY = 0;
+
+// Simpan posisi awal sentuhan
+document.addEventListener('touchstart', e => {
+  touchStartY = e.touches[0].clientY;
+}, {passive: true});
+
+// Cegah pull-to-refresh & scroll liar pas main
+document.addEventListener('touchmove', e => {
+  // kalau lagi di dalam menu, biarin bisa scroll
+  if (e.target.closest('#menu, #credit')) return;
+
+  // kalau sudah di paling atas dan narik ke bawah > 10px, tahan
+  if (window.scrollY <= 0) {
+    let diff = e.touches[0].clientY - touchStartY;
+    if (diff > 10) {
+      e.preventDefault();
+    }
+  }
+}, {passive: false});
+
+// Cegah double-tap zoom yang bikin board geser
+let lastTouch = 0;
+document.addEventListener('touchend', e => {
+  let now = Date.now();
+  if (now - lastTouch <= 300) {
+    e.preventDefault();
+  }
+  lastTouch = now;
+}, {passive: false});
+
+// Cegah klik kanan / long-press biar gak muncul menu save image
+document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+</head>
+<body>
+<div class="container">
+<header>
+<div class="topbar">
+  <h1 class="logo">Block Blast</h1>
+  <button id="burger" class="burger" onclick="toggleMenu()">☰</button>
+</div>
+<div class="scores">
+  <div class="score-box"><p>SKOR</p><h2 id="score">0</h2></div>
+  <div class="score-box"><p>BEST</p><h2 id="best">0</h2></div>
+  <div class="score-box"><p>KOMBO</p><h2 id="comboCount">0</h2></div>
+</div>
+</header>
+<div class="board-wrap"><div class="board" id="board"></div><div id="combo">COMBO!</div></div>
+<div class="pieces" id="pieces"></div>
+<div style="text-align:center;color:#666;font-size:11px;margin-top:10px">TAP BALOK → TAP PAPAN</div>
+<div style="text-align:center;color:#666;font-size:11px;">ATAU</div>
+<div style="text-align:center;color:#666;font-size:11px;">SERET BALOK → KE PAPAN</div>
+<footer class="footer">Block Blast - <span><script>document.write(new Date().getFullYear())</script></span></footer>
+</div>
+
+<div class="popup" id="menu">
+  <div class="popup-card menu-card">
+    <h3 style="color:white;font-size:22px;margin-bottom:18px">PAUSE</h3>
+    <button class="btn menu-btn" onclick="resumeGame()">Lanjut</button>
+    <button class="btn menu-btn outline" onclick="restartFromMenu()">Ulang</button>
+    <button class="btn menu-btn outline" onclick="openCredit()">Kredit</button>
+    <button class="btn menu-btn danger" onclick="exitGame()">Keluar</button>
+  </div>
+</div>
+
+<div class="popup" id="credit">
+  <div class="popup-card" style="
+    background:#1e1e4a;
+    border:2px solid #2a2a6a;
+    border-radius:28px;
+    padding:28px 24px;
+    text-align:center;
+    max-width:360px;
+    width:90%;
+    margin: auto;
+  ">
+    <h3 style="color:#00e5ff;font-size:26px;font-weight:800;">KREDIT</h3>
+    
+    <div style="color:#b8b8e0;font-size:14px;line-height:1.5;font-weight:600;">
+      Block Blast <span><script>document.write(new Date().getFullYear())</script></span><br>
+      Dibuat oleh Aril & Ai kesayangan
+    </div>
+    
+    <div style="margin:22px 0;display:flex;flex-direction:column;gap:6px;">
+      <a href="#" style="color:#c0392b;font-weight:700;text-decoration:underline;font-size:15px;">Website</a>
+      <a href="#" style="color:#c0392b;font-weight:700;text-decoration:underline;font-size:15px;">Portofolio</a>
+      <a href="#" style="color:#c0392b;font-weight:700;text-decoration:underline;font-size:15px;">Laporkan Bug</a>
+    </div>
+    
+    <div style="color:#a0a0c0;font-size:13px;line-height:1.6;font-weight:600;">
+      Version: v5.0.2<br>
+      © 2026
+    </div>
+    <button class="btn" onclick="closeCredit()">TUTUP</button>
+  </div>
+</div>
+
+<div class="popup" id="over"><div class="popup-card"><h3 style="color:white;font-size:28px">GAME OVER</h3><h2 id="final" style="color:#ffde59;font-size:38px;margin:15px 0">0</h2><button class="btn" onclick="restart()">MAIN LAGI</button></div></div>
+
+<script src="./main.js"></script>
+
+<script>
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('PWA v1.0.2 ready:', reg.scope))
-        .catch(err => console.log('PWA fail:', err));
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('PWA v5.0.3 ready:', reg.scope);
     });
   }
 </script>
+
 </body>
 </html>
