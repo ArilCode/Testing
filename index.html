@@ -15,41 +15,26 @@
 <link rel="stylesheet" href="./style.css">
 
 <script>
-// === SCRIPT KHUSUS BLOCK BLAST ===
-let touchStartY = 0;
-
-// Simpan posisi awal sentuhan
-document.addEventListener('touchstart', e => {
-  touchStartY = e.touches[0].clientY;
-}, {passive: true});
-
-// Cegah pull-to-refresh & scroll liar pas main
-document.addEventListener('touchmove', e => {
-  // kalau lagi di dalam menu, biarin bisa scroll
-  if (e.target.closest('#menu, #credit')) return;
-
-  // kalau sudah di paling atas dan narik ke bawah > 10px, tahan
-  if (window.scrollY <= 0) {
-    let diff = e.touches[0].clientY - touchStartY;
-    if (diff > 10) {
-      e.preventDefault();
-    }
-  }
-}, {passive: false});
-
-// Cegah double-tap zoom yang bikin board geser
-let lastTouch = 0;
-document.addEventListener('touchend', e => {
-  let now = Date.now();
-  if (now - lastTouch <= 300) {
-    e.preventDefault();
-  }
-  lastTouch = now;
-}, {passive: false});
-
-// Cegah klik kanan / long-press biar gak muncul menu save image
-document.addEventListener('contextmenu', e => e.preventDefault());
-</script>
+    let _allowInternalReload=false;
+    function allowAndReload(){_allowInternalReload=true;location.reload();}
+    (function(){
+      document.addEventListener('keydown',function(e){
+        if(_allowInternalReload) return;
+        const k=e.key.toLowerCase();
+        if(e.key==='F5'||(e.ctrlKey&&(k==='r'||k==='w'))||(e.metaKey&&(k==='r'||k==='w'))){e.preventDefault();e.stopImmediatePropagation();return false;}
+      },{capture:true});
+      let sy=0;
+      document.addEventListener('touchstart',e=>{sy=e.touches[0].clientY;},{passive:true});
+        document.addEventListener('touchmove', e => {
+        if (_allowInternalReload) return;
+        if (e.target.closest('#mainMenu')) return;
+        if (window.scrollY <= 0) { const dy = e.touches[0].clientY - sy; if (dy > 10) e.preventDefault(); }
+      }, { passive: false });
+      history.pushState(null,null,location.href);
+      window.addEventListener('popstate',()=>{if(_allowInternalReload) return;history.pushState(null,null,location.href);});
+      window.addEventListener('beforeunload',e=>{if(_allowInternalReload) return;e.preventDefault();e.returnValue='';return '';});
+    })();
+    </script>
 </head>
 <body>
 <div class="container">
