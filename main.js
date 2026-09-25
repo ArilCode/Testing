@@ -508,3 +508,35 @@ function exitGame(){ snd('over'); if(confirm('Keluar dari game? Skor Best tetap 
 function gameOver(){ snd('over'); document.getElementById('final').textContent=score; document.getElementById('over').classList.add('show');}
 function restart(){score=0; combo=0; selected=null; isPaused=false; document.getElementById('score').textContent=0; document.getElementById('comboCount').textContent=0; document.getElementById('over').classList.remove('show'); document.getElementById('menu').classList.remove('show'); createBoard(); genPieces();}
 createBoard(); genPieces();
+
+// === ANTI TIDUR - LAYAR GAK AKAN PADAM ===
+let wakeLock = null;
+
+async function enableNoSleep() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      console.log('Wake Lock aktif - layar gak akan padam');
+      wakeLock.addEventListener('release', () => {
+        console.log('Wake Lock lepas');
+      });
+    }
+  } catch (err) {
+    console.log('Wake Lock gagal:', err.message);
+  }
+}
+
+// otomatis aktif pas game mulai / pertama kali tap
+document.addEventListener('pointerdown', () => {
+  if (!wakeLock) enableNoSleep();
+}, { once: true });
+
+// kalau user pindah tab terus balik lagi, nyalakan lagi
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && !wakeLock) {
+    enableNoSleep();
+  }
+});
+
+// pas PWA di-install
+window.addEventListener('load', enableNoSleep);
