@@ -509,7 +509,6 @@ function gameOver(){ snd('over'); document.getElementById('final').textContent=s
 function restart(){score=0; combo=0; selected=null; isPaused=false; document.getElementById('score').textContent=0; document.getElementById('comboCount').textContent=0; document.getElementById('over').classList.remove('show'); document.getElementById('menu').classList.remove('show'); createBoard(); genPieces();}
 createBoard(); genPieces();
 
-// === ANTI TIDUR - LAYAR GAK AKAN PADAM ===
 let wakeLock = null;
 
 async function enableNoSleep() {
@@ -526,17 +525,14 @@ async function enableNoSleep() {
   }
 }
 
-// otomatis aktif pas game mulai / pertama kali tap
 document.addEventListener('pointerdown', () => {
   if (!wakeLock) enableNoSleep();
 }, { once: true });
 
-// kalau user pindah tab terus balik lagi, nyalakan lagi
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && !wakeLock) {
     enableNoSleep();
   }
 });
 
-// pas PWA di-install
 window.addEventListener('load', enableNoSleep);
