@@ -504,7 +504,6 @@ function resumeGame(){ snd('place'); document.getElementById('menu').classList.r
 function restartFromMenu(){ snd('clear'); document.getElementById('menu').classList.remove('show'); setTimeout(()=>restart(),150); }
 function openCredit(){ snd('tap'); document.getElementById('credit').classList.add('show'); }
 function closeCredit(){ snd('tap'); document.getElementById('credit').classList.remove('show'); }
-function exitGame(){ snd('over'); if(confirm('Keluar dari game? Skor Best tetap kesimpan.')){ try{ window.close(); }catch(e){} setTimeout(()=>{ location.href='about:blank'; },300); } }
 function gameOver(){ snd('over'); document.getElementById('final').textContent=score; document.getElementById('over').classList.add('show');}
 function restart(){score=0; combo=0; selected=null; isPaused=false; document.getElementById('score').textContent=0; document.getElementById('comboCount').textContent=0; document.getElementById('over').classList.remove('show'); document.getElementById('menu').classList.remove('show'); createBoard(); genPieces();}
 createBoard(); genPieces();
