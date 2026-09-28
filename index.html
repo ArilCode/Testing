@@ -1,114 +1,150 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
-<link rel="icon" type="image/png" href="./image/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="./image/favicon.svg" />
-<link rel="shortcut icon" href="./image/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="./image/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="Blocky Blast" />
-<link rel="manifest" href="./site.webmanifest" />
-<title>Blocky Blast</title>
-<meta name="theme-color" content="#1a1a2e">
-<link rel="stylesheet" href="./style.css">
-
-<script>
-    let _allowInternalReload=false;
-    function allowAndReload(){_allowInternalReload=true;location.reload();}
-    (function(){
-      document.addEventListener('keydown',function(e){
-        if(_allowInternalReload) return;
-        const k=e.key.toLowerCase();
-        if(e.key==='F5'||(e.ctrlKey&&(k==='r'||k==='w'))||(e.metaKey&&(k==='r'||k==='w'))){e.preventDefault();e.stopImmediatePropagation();return false;}
-      },{capture:true});
-      let sy=0;
-      document.addEventListener('touchstart',e=>{sy=e.touches[0].clientY;},{passive:true});
-        document.addEventListener('touchmove', e => {
-        if (_allowInternalReload) return;
-        if (e.target.closest('#mainMenu')) return;
-        if (window.scrollY <= 0) { const dy = e.touches[0].clientY - sy; if (dy > 10) e.preventDefault(); }
-      }, { passive: false });
-      history.pushState(null,null,location.href);
-      window.addEventListener('popstate',()=>{if(_allowInternalReload) return;history.pushState(null,null,location.href);});
-      window.addEventListener('beforeunload',e=>{if(_allowInternalReload) return;e.preventDefault();e.returnValue='';return '';});
-    })();
-    </script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Guru - ArilCode</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#0f172a;color:#e2e8f0;min-height:100vh;padding:14px}
+.wrap{max-width:750px;margin:auto}
+.card{background:#1e293b;border-radius:18px;padding:18px;margin-bottom:12px;border:1px solid #334155}
+h2{margin:0 0 10px}input,select{width:100%;padding:13px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:#fff;margin-bottom:10px}
+button{padding:12px 14px;border-radius:12px;border:0;font-weight:800;cursor:pointer}
+.btn{width:100%;background:#7c3aed;color:#fff}
+.btnDel{background:#ef4444;color:#fff;padding:6px 10px;font-size:11px;border-radius:8px}
+.btnDelAll{background:#dc2626;color:#fff;width:100%;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;border-bottom:1px solid #334155;text-align:left}
+th{color:#94a3b8;font-size:11px;letter-spacing:1px}
+.badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700}
+.Hadir{background:#14532d;color:#86efac}.Izin{background:#713f12;color:#fde68a}.Sakit{background:#881337;color:#fda4af}.Alpa{background:#7f1d1d;color:#fecaca}
+#toast{position:fixed;bottom:15px;left:50%;transform:translate(-50%,100px);background:#fff;color:#000;padding:12px 16px;border-radius:10px;transition:.3s;z-index:10}#toast.show{transform:translate(-50%,0)}
+.hidden{display:none}
+.stat{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.stat div{background:#0f172a;padding:10px;border-radius:12px;text-align:center;border:1px solid #334155}.stat b{font-size:18px;display:block}
+</style>
 </head>
 <body>
-<div class="container">
-<header>
-<div class="topbar">
-  <h1 class="logo">Blocky Blast</h1>
-  <button id="burger" class="burger" onclick="toggleMenu()">☰</button>
-</div>
-<div class="scores">
-  <div class="score-box"><p>SKOR</p><h2 id="score">0</h2></div>
-  <div class="score-box"><p>BEST</p><h2 id="best">0</h2></div>
-  <div class="score-box"><p>KOMBO</p><h2 id="comboCount">0</h2></div>
-</div>
-</header>
-<div class="board-wrap"><div class="board" id="board"></div><div id="combo">COMBO!</div></div>
-<div class="pieces" id="pieces"></div>
-<div style="text-align:center;color:#666;font-size:11px;margin-top:10px">TAP BALOK → TAP PAPAN</div>
-<div style="text-align:center;color:#666;font-size:11px;">ATAU</div>
-<div style="text-align:center;color:#666;font-size:11px;">SERET BALOK → KE PAPAN</div>
-<footer class="footer">Blocky Blast - <span><script>document.write(new Date().getFullYear())</script></span></footer>
+<div class="wrap">
+
+<!-- LOGIN -->
+<div class="card" id="loginCard">
+<h2>🔒 Login Guru Admin</h2>
+<p style="font-size:12px;color:#94a3b8">Login untuk melihat & hapus data rekap</p>
+<input id="user" placeholder="Username">
+<input id="pass" type="password" placeholder="Password">
+<button class="btn" onclick="login()">Masuk Dashboard</button>
+<p style="font-size:11px;color:#64748b;margin-top:10px">Default: guru / aril123 - bisa diganti di kode bawah</p>
 </div>
 
-<div class="popup" id="menu">
-  <div class="popup-card menu-card">
-    <h3 style="color:white;font-size:22px;margin-bottom:18px">PAUSE</h3>
-    <button class="btn menu-btn" onclick="resumeGame()">Lanjut</button>
-    <button class="btn menu-btn outline" onclick="restartFromMenu()">Ulang</button>
-    <button class="btn menu-btn outline" onclick="openCredit()">Kredit</button>
-  </div>
+<!-- DASHBOARD -->
+<div class="card hidden" id="dashCard">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<h2>📊 Rekap Absensi - 26 Siswa</h2>
+<button onclick="logout()" style="background:#334155;color:#fff">Logout</button>
 </div>
 
-<div class="popup" id="credit">
-  <div class="popup-card" style="
-    background:#1e1e4a;
-    border:2px solid #2a2a6a;
-    border-radius:28px;
-    padding:28px 24px;
-    text-align:center;
-    max-width:360px;
-    width:90%;
-    margin: auto;
-  ">
-    <h3 style="color:#00e5ff;font-size:26px;font-weight:800;">KREDIT</h3>
-    
-    <div style="color:#b8b8e0;font-size:14px;line-height:1.5;font-weight:600;">
-      Blocky Blast <span><script>document.write(new Date().getFullYear())</script></span><br>
-      Dibuat oleh Aril & Ai kesayangan
-    </div>
-    
-    <div style="margin:22px 0;display:flex;flex-direction:column;gap:6px;">
-      <a href="#" style="color:#c0392b;font-weight:700;text-decoration:underline;font-size:15px;">Website</a>
-      <a href="#" style="color:#c0392b;font-weight:700;text-decoration:underline;font-size:15px;">Portofolio</a>
-      <a href="#" style="color:#c0392b;font-weight:700;text-decoration:underline;font-size:15px;">Laporkan Bug</a>
-    </div>
-    
-    <div style="color:#a0a0c0;font-size:13px;line-height:1.6;font-weight:600;">
-      Version: v5.0.8<br>
-      © 2026
-    </div>
-    <button class="btn" onclick="closeCredit()">TUTUP</button>
-  </div>
+<div class="stat">
+<div><b id="cHadir">0</b><small>Hadir</small></div>
+<div><b id="cIzin">0</b><small>Izin</small></div>
+<div><b id="cSakit">0</b><small>Sakit</small></div>
+<div><b id="cAlpa">0</b><small>Alpa</small></div>
 </div>
 
-<div class="popup" id="over"><div class="popup-card"><h3 style="color:white;font-size:28px">GAME OVER</h3><h2 id="final" style="color:#ffde59;font-size:38px;margin:15px 0">0</h2><button class="btn" onclick="restart()">MAIN LAGI</button></div></div>
+<input id="fNama" placeholder="Cari nama siswa..." oninput="render()">
+<select id="fStatus" onchange="render()"><option value="">Semua Status</option><option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpa</option></select>
 
-<script src="./main.js"></script>
+<p id="info" style="font-size:12px;color:#94a3b8"></p>
+<table>
+<thead><tr><th>Waktu</th><th>Nama</th><th>Status</th><th>Aksi</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<button class="btnDelAll" onclick="hapusSemua()">🗑️ Hapus Semua Data</button>
+<button class="btn" style="background:#059669;margin-top:8px" onclick="exportCSV()">Download CSV</button>
+</div>
+
+</div>
+<div id="toast"></div>
 
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').then(reg => {
-      console.log('PWA v5.0.8 ready:', reg.scope);
-    });
-  }
-</script>
+const SUPABASE_URL="https://yrycrxdceukuiqtyielu.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyeWNyeGRjZXVrdWlxdHlpZWx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1OTM2NDIsImV4cCI6MjEwNjE2OTY0Mn0.UheqY6RVyeNB8A7OThpEwwWYYqzUPgt7SuMRhQJy7ak";
+const $=id=>document.getElementById(id);
+function toast(m){$("toast").textContent=m;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2500)}
 
+// === GANTI USERNAME & PASSWORD DISINI ===
+const GURU_USER = "guru";
+const GURU_PASS = "aril123";
+// =======================================
+
+function login(){
+ if($("user").value===GURU_USER && $("pass").value===GURU_PASS){
+  localStorage.setItem("guruAdmin","1");
+  $("loginCard").classList.add("hidden");
+  $("dashCard").classList.remove("hidden");
+  load();
+  toast("Login berhasil");
+ }else{toast("Username / password salah")}
+}
+function logout(){localStorage.removeItem("guruAdmin");location.reload()}
+if(localStorage.getItem("guruAdmin")==="1"){$("loginCard").classList.add("hidden");$("dashCard").classList.remove("hidden");load();}
+
+let allData=[];
+async function load(){
+ $("info").textContent="Memuat data...";
+ const res=await fetch(`${SUPABASE_URL}/rest/v1/absensi?order=created_at.desc`,{
+  headers:{"apikey":SUPABASE_KEY,"Authorization":`Bearer ${SUPABASE_KEY}`}
+ });
+ allData=await res.json();
+ render();
+}
+function render(){
+ let data=[...allData];
+ const n=$("fNama").value.toLowerCase(); const s=$("fStatus").value;
+ if(n) data=data.filter(d=>d.nama.toLowerCase().includes(n));
+ if(s) data=data.filter(d=>d.status===s);
+
+ $("cHadir").textContent=allData.filter(d=>d.status==="Hadir").length;
+ $("cIzin").textContent=allData.filter(d=>d.status==="Izin").length;
+ $("cSakit").textContent=allData.filter(d=>d.status==="Sakit").length;
+ $("cAlpa").textContent=allData.filter(d=>d.status==="Alpa").length;
+
+ $("info").textContent=`Menampilkan ${data.length} dari total ${allData.length} data`;
+ $("tbody").innerHTML=data.map(d=>`
+  <tr>
+   <td>${d.tanggal}<br><small style="color:#94a3b8">${d.jam}</small></td>
+   <td>${d.nama}</td>
+   <td><span class="badge ${d.status}">${d.status}</span></td>
+   <td><button class="btnDel" onclick="hapusSatu('${d.id}')">Hapus</button></td>
+  </tr>
+ `).join("");
+}
+
+// HAPUS 1 DATA - LANGSUNG KE DATABASE
+async function hapusSatu(id){
+ if(!confirm("Yakin hapus data ini? Data akan hilang dari database!")) return;
+ const res=await fetch(`${SUPABASE_URL}/rest/v1/absensi?id=eq.${id}`,{
+  method:"DELETE",
+  headers:{"apikey":SUPABASE_KEY,"Authorization":`Bearer ${SUPABASE_KEY}`}
+ });
+ if(res.ok){toast("Data terhapus dari database");load()}else{toast("Gagal hapus")}
+}
+
+// HAPUS SEMUA DATA
+async function hapusSemua(){
+ if(!confirm("YAKIN HAPUS SEMUA DATA ABSENSI? Tidak bisa dikembalikan!")) return;
+ const pass=prompt("Ketik password guru untuk konfirmasi hapus semua:");
+ if(pass!==GURU_PASS){toast("Password salah");return;}
+ const res=await fetch(`${SUPABASE_URL}/rest/v1/absensi?id=gt.0`,{
+  method:"DELETE",
+  headers:{"apikey":SUPABASE_KEY,"Authorization":`Bearer ${SUPABASE_KEY}`}
+ });
+ if(res.ok){toast("Semua data terhapus");load()}else{toast("Gagal hapus semua")}
+}
+
+function exportCSV(){
+ let csv="Tanggal,Jam,Nama,Status\n";
+ allData.forEach(d=>{csv+=`"${d.tanggal}","${d.jam}","${d.nama}","${d.status}"\n`});
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="rekap-absensi.csv";a.click();
+}
+</script>
 </body>
 </html>
