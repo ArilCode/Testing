@@ -1,140 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Maintenance</title>
+<title>Download File</title>
 <style>
-  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#fff;font-family:Inter,system-ui,sans-serif}
-  .wrap{width:640px;max-width:92vw;text-align:center}
-  svg{width:100%;height:auto}
-  h1{font-size:28px;font-weight:800;line-height:1.15;margin:22px 0 0;color:#1A1A1A;letter-spacing:-0.3px}
-  p{font-size:11px;color:#777;margin:10px 0 0;letter-spacing:0.1px}
+  body{font-family:Inter,system-ui;background:#f6f8ff;margin:0;min-height:100vh;display:grid;place-items:center}
+  .card{width:420px;max-width:92vw;background:#fff;border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+  h1{font-size:20px;margin:0 0 16px}
+  .file{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border:1px solid #e6eaf5;border-radius:12px;margin-bottom:12px}
+  .file:last-child{margin-bottom:0}
+  .name{font-weight:600;font-size:14px}
+  .size{font-size:12px;color:#777;margin-top:2px}
+  .btn{background:#6aa8e7;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer}
+  .btn:hover{background:#5a96d2}
+  .btn:disabled{opacity:.6;cursor:default}
 </style>
 </head>
 <body>
-<div class="wrap">
-<svg viewBox="0 0 600 380" xmlns="http://www.w3.org/2000/svg">
+<div class="card">
+  <h1>Download File</h1>
 
-  <!-- ===== CRANE ARM ===== -->
-  <g>
-    <rect x="92" y="77" width="330" height="18" rx="9" fill="#8AB9E8"/>
-    <!-- stripes -->
-    <g opacity="0.18">
-      <path d="M105 77 L92 95 L105 95 L118 77 Z" fill="white"/>
-      <path d="M135 77 L122 95 L135 95 L148 77 Z" fill="white"/>
-      <path d="M165 77 L152 95 L165 95 L178 77 Z" fill="white"/>
-      <path d="M195 77 L182 95 L195 95 L208 77 Z" fill="white"/>
-      <path d="M225 77 L212 95 L225 95 L238 77 Z" fill="white"/>
-      <path d="M255 77 L242 95 L255 95 L268 77 Z" fill="white"/>
-      <path d="M285 77 L272 95 L285 95 L298 77 Z" fill="white"/>
-      <path d="M315 77 L302 95 L315 95 L328 77 Z" fill="white"/>
-      <path d="M345 77 L332 95 L345 95 L358 77 Z" fill="white"/>
-      <path d="M375 77 L362 95 L375 95 L388 77 Z" fill="white"/>
-    </g>
-    <circle cx="385" cy="86" r="8" fill="none" stroke="#C2DDF5" stroke-width="2"/>
-    <circle cx="385" cy="86" r="3" fill="#C2DDF5"/>
-    <!-- cables atas -->
-    <line x1="105" y1="82" x2="395" y2="16" stroke="#8AB9E8" stroke-width="1.4"/>
-    <line x1="400" y1="16" x2="435" y2="82" stroke="#8AB9E8" stroke-width="1.4"/>
-  </g>
+  <div class="file">
+    <div>
+      <div class="name">main.js</div>
+    </div>
+    <button class="btn" onclick="downloadFile('./files/main.js','main.js',this)">Unduh</button>
+  </div>
 
-  <!-- ===== TOWER ===== -->
-  <rect x="391" y="8" width="14" height="226" fill="#8AB9E8"/>
-  <rect x="391" y="8" width="7" height="226" fill="#7AA6D6"/>
-  <rect x="381" y="226" width="34" height="88" rx="2" fill="#8AB9E8"/>
-  <rect x="381" y="226" width="34" height="12" rx="2" fill="#7AA6D6"/>
+  <div class="file">
+    <div>
+      <div class="name">style.css</div>
+    </div>
+    <button class="btn" onclick="downloadFile('./files/style.css','style.css',this)">Unduh</button>
+  </div>
 
-  <!-- ===== TROLLEY ===== -->
-  <g transform="translate(190, 77)">
-    <rect x="-14" y="4" width="28" height="26" rx="5" fill="#7AA6D6"/>
-    <rect x="-10" y="9" width="20" height="16" rx="3" fill="#BDD9F2"/>
-    <circle cx="0" cy="17" r="6" fill="#DDEBF7" stroke="#7AA6D6" stroke-width="1"/>
-    <!-- kabel turun -->
-    <line x1="-4" y1="30" x2="-4" y2="58" stroke="#8AB9E8" stroke-width="1.8"/>
-    <line x1="4" y1="30" x2="4" y2="58" stroke="#8AB9E8" stroke-width="1.8"/>
-    <circle cx="0" cy="66" r="7" fill="white" stroke="#8AB9E8" stroke-width="1.8"/>
-    <circle cx="0" cy="66" r="2" fill="#8AB9E8"/>
-  </g>
-
-  <!-- ===== CABIN ===== -->
-  <g transform="translate(306, 104)">
-    <path d="M0 24 L22 4 H68 V58 H0 Z" fill="#8AB9E8" stroke="#7AA6D6" stroke-width="1.8" stroke-linejoin="round"/>
-    <path d="M6 28 L20 14 V34 Z" fill="white"/>
-    <path d="M6 28 L20 14 V34 Z" fill="none" stroke="#7AA6D6" stroke-width="1"/>
-    <rect x="28" y="8" width="34" height="22" rx="2" fill="white" stroke="#7AA6D6" stroke-width="1"/>
-    <line x1="45" y1="8" x2="45" y2="30" stroke="#7AA6D6" stroke-width="1"/>
-    <rect x="0" y="38" width="68" height="6" rx="1" fill="white" opacity="0.7"/>
-    <rect x="0" y="46" width="68" height="12" rx="1" fill="#7AA6D6"/>
-    <rect x="-14" y="58" width="82" height="8" rx="2" fill="#8AB9E8"/>
-  </g>
-
-  <!-- ===== COUNTERWEIGHT ===== -->
-  <g transform="translate(478, 98)">
-    <rect x="-40" y="0" width="52" height="18" rx="4" fill="#8AB9E8"/>
-    <rect x="-40" y="26" width="52" height="18" rx="4" fill="#8AB9E8"/>
-  </g>
-
-  <!-- ===== GROUND + ROCKS ===== -->
-  <g transform="translate(365, 304)">
-    <rect x="0" y="18" width="80" height="10" rx="2" fill="#7AA6D6"/>
-    <g stroke="#6E9BCB" stroke-width="1.2" opacity="0.9">
-      <line x1="8" y1="6" x2="8" y2="18"/><line x1="22" y1="6" x2="22" y2="18"/><line x1="36" y1="6" x2="36" y2="18"/>
-      <line x1="50" y1="6" x2="50" y2="18"/><line x1="64" y1="6" x2="64" y2="18"/>
-      <line x1="4" y1="10" x2="76" y2="10"/><line x1="4" y1="14" x2="76" y2="14"/>
-    </g>
-    <path d="M-4 28 L4 22 L12 24 L16 28 Z" fill="#8AB9E8"/>
-    <path d="M10 28 L32 18 L50 28 Z" fill="#B9D6F0"/>
-    <path d="M42 28 L88 8 L124 22 L124 28 Z" fill="#8AB9E8"/>
-    <path d="M42 28 L88 8 L124 22 L124 28 Z" fill="white" opacity="0.15"/>
-    <path d="M116 28 L130 22 L138 26 L138 28 Z" fill="#B9D6F0"/>
-  </g>
-
-  <!-- ===== MONITOR ===== -->
-  <g transform="translate(52, 154)">
-    <rect width="210" height="145" rx="18" fill="#8AB9E8"/>
-    <rect x="8" y="8" width="194" height="112" rx="10" fill="#F0F6FF"/>
-    <rect x="8" y="120" width="194" height="25" rx="0" fill="#8AB9E8"/>
-    <rect x="8" y="120" width="194" height="10" rx="0" fill="#7AA6D6" opacity="0.4"/>
-    <!-- stand -->
-    <g transform="translate(76, 145)">
-      <rect x="0" y="0" width="58" height="12" rx="2" fill="#7AA6D6"/>
-      <path d="M8 12 L50 12 L58 18 L0 18 Z" fill="#8AB9E8"/>
-    </g>
-    <!-- screen content left -->
-    <g transform="translate(20, 20)">
-      <rect width="72" height="48" rx="4" fill="#E6F0FF"/>
-      <path d="M8 36 C8 18, 18 14, 36 14 C54 14, 64 18, 64 36" fill="none" stroke="#9ABCE0" stroke-width="1"/>
-      <line x1="8" y1="20" x2="8" y2="36" stroke="#9ABCE0" stroke-width="1"/>
-      <line x1="64" y1="20" x2="64" y2="36" stroke="#9ABCE0" stroke-width="1"/>
-      <g transform="translate(36, 18)">
-      </g>
-    </g>
-    <rect x="20" y="76" width="48" height="9" rx="2" fill="#E6F0FF"/>
-    <rect x="20" y="90" width="72" height="9" rx="2" fill="#E6F0FF"/>
-    <!-- image card di atas monitor (yang diangkat kren) -->
-    <g transform="translate(100, -2)">
-      <!-- tali -->
-      <line x1="28" y1="-58" x2="0" y2="-14" stroke="#8AB9E8" stroke-width="1.5"/>
-      <line x1="28" y1="-58" x2="72" y2="-14" stroke="#8AB9E8" stroke-width="1.5"/>
-      <rect y="-14" width="88" height="62" rx="3" fill="white" stroke="#B9D3EE" stroke-width="1.2"/>
-      <rect y="-14" width="88" height="20" rx="3" fill="#F3F8FF"/>
-      <circle cx="72" cy="-2" r="6" fill="#8AB9E8"/>
-      <path d="M0 22 L24 10 L40 18 L60 6 L88 14 L88 48 L0 48 Z" fill="#8AB9E8"/>
-      <path d="M0 28 L24 16 L40 24 L60 12 L88 20 L88 48 L0 48 Z" fill="#6EA1D6"/>
-    </g>
-    <!-- bottom right box -->
-    <g transform="translate(102, 76)">
-      <rect width="66" height="26" rx="3" fill="#F8FBFF" stroke="#B9D3EE" stroke-width="1"/>
-      <rect x="8" y="6" width="50" height="14" rx="2" fill="#E6F0FF"/>
-      <g transform="translate(66, 8)">
-      </g>
-    </g>
-  </g>
-</svg>
-
-<h1>This page is offline for <br>temporary.</h1>
-<p>Please check back around.<br />Thank you for your patience.</p>
+  <div class="file">
+    <div>
+      <div class="name">index.html</div>
+    </div>
+    <button class="btn" onclick="downloadFile('./files/index.html','index.html',this)">Unduh</button>
+  </div>
 </div>
+
+<script>
+function downloadFile(url, filename, btn){
+  const original = btn.textContent;
+  btn.textContent = 'Mengunduh...';
+  btn.disabled = true;
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(()=>{
+    btn.textContent = 'Selesai ✓';
+    setTimeout(()=>{
+      btn.textContent = original;
+      btn.disabled = false;
+    },1500);
+  },800);
+}
+</script>
 </body>
 </html>
