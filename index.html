@@ -1,69 +1,96 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Download File</title>
-<style>
-  body{font-family:Inter,system-ui;background:#f6f8ff;margin:0;min-height:100vh;display:grid;place-items:center}
-  .card{width:420px;max-width:92vw;background:#fff;border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-  h1{font-size:20px;margin:0 0 16px}
-  .file{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border:1px solid #e6eaf5;border-radius:12px;margin-bottom:12px}
-  .file:last-child{margin-bottom:0}
-  .name{font-weight:600;font-size:14px}
-  .size{font-size:12px;color:#777;margin-top:2px}
-  .btn{background:#6aa8e7;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer}
-  .btn:hover{background:#5a96d2}
-  .btn:disabled{opacity:.6;cursor:default}
-</style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="ACE • STUDENT SYSTEM - Absensi Digital" />
+
+<!-- Primary Meta Tags -->
+<meta name="title" content="Absensi Siswa 📚">
+
+<!-- Open Graph / Facebook / LinkedIn -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ab-ace.vercel.app/">
+<meta property="og:title" content="Absensi Siswa 📚">
+<meta property="og:description" content="ACE • STUDENT SYSTEM - Absensi Digital">
+<meta property="og:image" content="https://ab-ace.vercel.app/og-image.png?v=4">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://ab-ace.vercel.app/">
+<meta property="twitter:title" content="Absensi Siswa 📚">
+<meta property="twitter:description" content="ACE • STUDENT SYSTEM - Absensi Digital">
+<meta property="twitter:image" content="https://ab-ace.vercel.app/og-image.png?v=4">
+
+<link rel="icon" type="image/png" href="./images/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="./images/favicon.svg" />
+<link rel="shortcut icon" href="./images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Absensi SMANDA" />
+<link rel="manifest" href="./site.webmanifest" />
+<link rel="stylesheet" href="./style.css" />
+<title>Absensi Siswa/i</title>
 </head>
 <body>
-<div class="card">
-  <h1>Download File</h1>
+<div class="wrap">
+<header class="hero">
+<div class="brand">ACE • STUDENT SYSTEM</div>
+<h1>Absensi Siswa 📚</h1><p>Scan QR kertas milikmu untuk absen</p>
+<div class="clock"><div id="time">--:--:--</div><div id="date">Memuat tanggal...</div><span class="wib">🌏 Waktu Indonesia Barat (WIB)</span></div>
+</header>
+<section class="card">
+<h2>📝 Form Absensi</h2>
 
-  <div class="file">
-    <div>
-      <div class="name">main.js</div>
-    </div>
-    <button class="btn" onclick="downloadFile('./files/main.js','main.js',this)">Unduh</button>
+<button type="button" class="scanBtn" id="btnScan">📷 Scan QR Kertas</button>
+<div id="readerBox" class="readerBox">
+  <div class="camTools">
+    <button type="button" class="iconBtn" id="btnGaleri" aria-label="Pilih dari galeri">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    </button>
+    <button type="button" class="iconBtn" id="btnTutupScan" aria-label="Tutup">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
   </div>
+  <div id="reader"></div>
+</div>
+<input type="file" id="fileQR" accept="image/*" hidden>
 
-  <div class="file">
-    <div>
-      <div class="name">style.css</div>
-    </div>
-    <button class="btn" onclick="downloadFile('./files/style.css','style.css',this)">Unduh</button>
-  </div>
+<div id="identitas" class="identitas">
+  <div><small>NAMA</small><b id="outNama">-</b></div>
+  <div><small>KELAS</small><b id="outKelas">-</b></div>
+</div>
+<div id="hintNama" class="auto-hint"></div>
 
-  <div class="file">
-    <div>
-      <div class="name">index.html</div>
-    </div>
-    <button class="btn" onclick="downloadFile('./files/index.html','index.html',this)">Unduh</button>
-  </div>
+<div id="jadwalInfo" class="jadwalBox">Scan QR kertas untuk melihat jadwal hari ini</div>
+<form id="form">
+<label class="title">Mata Pelajaran</label>
+<select id="mapel" required><option value="">-- Scan QR Dulu --</option></select>
+<div id="hintMapel" class="auto-hint"></div>
+
+<label class="title">Guru Mapel</label>
+<select id="guru" required><option value="">-- Scan QR Dulu --</option></select>
+<div id="hintGuru" class="auto-hint"></div>
+
+<label class="title">Status Kehadiran</label>
+<div class="status three">
+  <label class="opt"><input type="radio" name="status" value="Hadir" required><span>✅ Hadir</span></label>
+  <label class="opt"><input type="radio" name="status" value="Izin"><span>📩 Izin</span></label>
+  <label class="opt"><input type="radio" name="status" value="Sakit"><span>🤒 Sakit</span></label>
 </div>
 
-<script>
-function downloadFile(url, filename, btn){
-  const original = btn.textContent;
-  btn.textContent = 'Mengunduh...';
-  btn.disabled = true;
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-
-  setTimeout(()=>{
-    btn.textContent = 'Selesai ✓';
-    setTimeout(()=>{
-      btn.textContent = original;
-      btn.disabled = false;
-    },1500);
-  },800);
-}
-</script>
+<div id="ketBox" class="ketBox">
+  <label class="title" for="keterangan">Keterangan Izin</label>
+  <textarea id="keterangan" maxlength="200" rows="3" placeholder="Tulis alasan izin, contoh: acara keluarga"></textarea>
+  <div class="ketHint"><span id="ketCount">0</span>/200</div>
+</div>
+<button class="send" id="send" type="submit">Kirim Absensi</button>
+<div class="success" id="success"></div>
+</form>
+<p class="note">data tersimpan di DataBase</p>
+</section>
+<div class="footer">© <script>document.write(new Date().getFullYear())</script> • Made with 🖤 by ACE (ArilCode Engineer)</div>
+</div>
+<div id="toast"></div>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="./main.js"></script>
 </body>
 </html>
