@@ -33,7 +33,7 @@
 <body>
 <div class="wrap">
 <header class="hero">
-<div class="brand">ACE • STUDENT SYSTEM</div>
+<div class="brand">ACE • SMANDA</div>
 <h1>Absensi Siswa 📚</h1><p>Scan QR kertas milikmu untuk absen</p>
 <div class="clock"><div id="time">--:--:--</div><div id="date">Memuat tanggal...</div><span class="wib">🌏 Waktu Indonesia Barat (WIB)</span></div>
 </header>
@@ -54,14 +54,26 @@
 </div>
 <input type="file" id="fileQR" accept="image/*" hidden>
 
+<div id="qrPreview" class="qrPreview">
+  <div id="qrFrame" class="qrFrame">
+    <img id="qrImg" alt="QR yang dipindai">
+    <div class="scanLine"></div>
+    <div id="scanBadge" class="scanBadge"></div>
+  </div>
+</div>
+
 <div id="identitas" class="identitas">
-  <div><small>NAMA</small><b id="outNama">-</b></div>
+  <div class="c2"><small>NAMA</small><b id="outNama">-</b></div>
   <div><small>KELAS</small><b id="outKelas">-</b></div>
+  <div><small>PANGGILAN</small><b id="outPanggilan">-</b></div>
+  <div class="c2"><small>ID</small><b id="outId" class="mono">-</b></div>
 </div>
 <div id="hintNama" class="auto-hint"></div>
 
 <div id="jadwalInfo" class="jadwalBox">Scan QR kertas untuk melihat jadwal hari ini</div>
-<form id="form">
+
+<div id="lockHint" class="lockHint">🔒 Scan QR dulu untuk membuka form</div>
+<form id="form" class="locked">
 <label class="title">Mata Pelajaran</label>
 <select id="mapel" required><option value="">-- Scan QR Dulu --</option></select>
 <div id="hintMapel" class="auto-hint"></div>
@@ -72,9 +84,9 @@
 
 <label class="title">Status Kehadiran</label>
 <div class="status three">
-  <label class="opt"><input type="radio" name="status" value="Hadir" required><span>✅ Hadir</span></label>
-  <label class="opt"><input type="radio" name="status" value="Izin"><span>📩 Izin</span></label>
-  <label class="opt"><input type="radio" name="status" value="Sakit"><span>🤒 Sakit</span></label>
+<label class="opt"><input type="radio" name="status" value="Hadir" required><span>✅ Hadir</span></label>
+<label class="opt"><input type="radio" name="status" value="Izin"><span>📩 Izin</span></label>
+<label class="opt"><input type="radio" name="status" value="Sakit"><span>🤒 Sakit</span></label>
 </div>
 
 <div id="ketBox" class="ketBox">
@@ -82,6 +94,7 @@
   <textarea id="keterangan" maxlength="200" rows="3" placeholder="Tulis alasan izin, contoh: acara keluarga"></textarea>
   <div class="ketHint"><span id="ketCount">0</span>/200</div>
 </div>
+
 <button class="send" id="send" type="submit">Kirim Absensi</button>
 <div class="success" id="success"></div>
 </form>

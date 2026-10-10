@@ -106,6 +106,7 @@ const $ = id => document.getElementById(id);
 const TZ = "Asia/Jakarta";
 const HDR = {"apikey":SUPABASE_KEY,"Authorization":`Bearer ${SUPABASE_KEY}`};
 const JSONH = {...HDR,"Content-Type":"application/json"};
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
 
 /* ID unik HP ini. 1 HP = 1 QR dicek di server. */
 function getDeviceId(){
@@ -117,6 +118,12 @@ function getDeviceId(){
   return id;
 }
 const DEVICE_ID=getDeviceId();
+
+function maskId(k){
+  k=String(k||"");
+  if(k.length<=4)return k;
+  return k.slice(0,3)+"*".repeat(k.length-4)+k.slice(-1);
+}
 
 function dateLabel(d=new Date()){return new Intl.DateTimeFormat("id-ID",{timeZone:TZ,weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d);}
 function timeLabel(d=new Date()){return d.toLocaleTimeString('en-GB',{timeZone:TZ,hour12:false});}
@@ -132,7 +139,29 @@ async function getHariLiburNasional(){const thn=new Date().getFullYear();if(cach
 async function cekLibur(){const hari=hariIni();const iso=tanggalISO();if(hari==="Sabtu"||hari==="Minggu")return{libur:true,alasan:`Hari ${hari} - Libur Akhir Pekan`,emoji:"😴"};const list=await getHariLiburNasional();const found=list.find(x=>x.holiday_date===iso);if(found)return{libur:true,alasan:found.holiday_name,emoji:"🎉"};return{libur:false};}
 
 let jadwalAktif=[],dataAbsenHariIni=[],GURU_KE_MAPEL={};
-let kelasAktif="",namaAktif="",kodeAktif="";
+let kelasAktif="",namaAktif="",kodeAktif="",agamaAktif="Islam";
+
+/* mapel yang tidak boleh dipilih: PAK, dan PAI untuk siswa Nonis */
+function dilarang(m){return m===PAK || (m===PAI && agamaAktif==="Nonis");}
+
+function opsiMapel(m,sudahMapel){
+  const o=document.createElement("option");o.value=m;o.textContent=m;
+  if(m===PAK){o.disabled=true;}
+  else if(m===PAI&&agamaAktif==="Nonis"){o.disabled=true;o.textContent=m+" 🔒 Khusus Islam";}
+  else if(sudahMapel.includes(m)){o.textContent=m+" ✅ Sudah absen";o.disabled=true;}
+  return o;
+}
+
+/* ================= KUNCI / BUKA FORM ================= */
+function kunciForm(kunci,pesan){
+  $("form").classList.toggle("locked",kunci);
+  $("lockHint").style.display=kunci?"block":"none";
+  if(kunci)$("lockHint").textContent=pesan||"🔒 Scan QR dulu untuk membuka form";
+  ["mapel","guru","send","keterangan"].forEach(id=>{$(id).disabled=kunci;});
+  document.querySelectorAll('input[name="status"]').forEach(r=>{r.disabled=kunci;if(kunci)r.checked=false;});
+  if(kunci){$("send").textContent="Kirim Absensi";}
+  toggleKet();
+}
 
 function buildGuruMap(kelas) {
   GURU_KE_MAPEL = {};
@@ -154,12 +183,7 @@ function daftarMapelHariIni(){
 function isiMapel(){
   const sudahMapel=dataAbsenHariIni.filter(d=>d.nama===namaAktif && d.kelas===kelasAktif).map(d=>d.mapel);
   $("mapel").innerHTML='<option value="">-- Pilih Mapel --</option>';
-  daftarMapelHariIni().forEach(m=>{
-    let o=document.createElement("option");o.value=m;o.textContent=m;
-    if(m===PAK){o.disabled=true;}
-    else if(sudahMapel.includes(m)){o.textContent=m+" ✅ Sudah absen";o.disabled=true;}
-    $("mapel").appendChild(o);
-  });
+  daftarMapelHariIni().forEach(m=>$("mapel").appendChild(opsiMapel(m,sudahMapel)));
   $("hintNama").style.display="block";
   $("hintNama").textContent=sudahMapel.length>0
     ? `Sudah absen hari ini: ${sudahMapel.join(", ")}`
@@ -170,8 +194,7 @@ async function renderMapelHari(){
   const libur=await cekLibur();
   if(libur.libur){renderLibur(libur);return;}
   $("jadwalInfo").classList.remove("liburBox");
-  document.querySelectorAll('input[name="status"]').forEach(r=>{r.disabled=false;r.parentElement.style.opacity="";r.parentElement.style.pointerEvents="";});
-  $("mapel").disabled=false;$("guru").disabled=false;$("send").disabled=false;$("send").textContent="Kirim Absensi";
+  kunciForm(false);
 
   const konfig=KONFIG_KELAS[kelasAktif];
   const hari=hariIni();
@@ -187,19 +210,17 @@ async function renderMapelHari(){
   });
   $("hintMapel").style.display="none";$("hintGuru").style.display="none";
 
-  const jadwalHTML = list.map(m=> m===PAK ? `<s>${PAK}</s>` : m).join(" • ");
+  const jadwalHTML = list.map(m=> dilarang(m) ? `<s>${m}</s>` : m).join(" • ");
   $("jadwalInfo").innerHTML=`📅 Hari ${hari}<br>Mapel: ${jadwalHTML}`;
 }
 
 function renderLibur(info){
   $("jadwalInfo").classList.add("liburBox");
   $("jadwalInfo").innerHTML=`${info.emoji} <b>HARI LIBUR</b><br>📢 ${info.alasan}<br>Absensi ditutup`;
-  $("mapel").innerHTML='<option value="">-- Libur --</option>';$("mapel").disabled=true;
-  $("guru").innerHTML='<option value="">-- Libur --</option>';$("guru").disabled=true;
-  $("send").disabled=true;$("send").textContent="Libur 🔒";
-  document.querySelectorAll('input[name="status"]').forEach(r=>{r.disabled=true;r.checked=false;r.parentElement.style.opacity="0.4";r.parentElement.style.pointerEvents="none";
-    toggleKet();
-  });
+  kunciForm(true,`${info.emoji} Hari libur, absensi ditutup`);
+  $("mapel").innerHTML='<option value="">-- Libur --</option>';
+  $("guru").innerHTML='<option value="">-- Libur --</option>';
+  $("send").textContent="Libur 🔒";
 }
 
 async function loadAbsenHariIni(){
@@ -216,6 +237,7 @@ $("mapel").addEventListener("change",()=>{
   const mapelVal=$("mapel").value;
   if(!mapelVal)return;
   if(mapelVal===PAK){toast(`❌ ${PAK} tidak bisa dipilih`);$("mapel").value="";return;}
+  if(mapelVal===PAI&&agamaAktif==="Nonis"){toast("🔒 PAI khusus siswa Islam");$("mapel").value="";return;}
   const sudah=dataAbsenHariIni.find(d=>d.nama===namaAktif && d.mapel===mapelVal && d.kelas===kelasAktif);
   if(sudah){toast(`❌ ${namaAktif} sudah absen ${mapelVal} hari ini!`);$("mapel").value="";$("guru").value="";return;}
   const guruAuto=KONFIG_KELAS[kelasAktif]?.mapel[mapelVal];
@@ -228,18 +250,13 @@ $("guru").addEventListener("change",()=>{
   if(!guruVal){isiMapel();return;}
   const listMapelGuru=GURU_KE_MAPEL[guruVal]||[];
   const sudahMapel=dataAbsenHariIni.filter(d=>d.nama===namaAktif && d.kelas===kelasAktif).map(d=>d.mapel);
-  const mapelHariIni=jadwalAktif.filter(m=>m!==PAK && listMapelGuru.includes(m) &&!sudahMapel.includes(m));
+  const mapelHariIni=jadwalAktif.filter(m=>!dilarang(m) && listMapelGuru.includes(m) &&!sudahMapel.includes(m));
   const mapelHariIniAll=jadwalAktif.filter(m=>m!==PAK && listMapelGuru.includes(m));
   if(mapelHariIni.length>0){
     isAuto=true;
-    let listTampil=injectPAK(mapelHariIniAll);
+    const listTampil=injectPAK(mapelHariIniAll);
     $("mapel").innerHTML='<option value="">-- Pilih Mapel --</option>';
-    listTampil.forEach(m=>{
-      let o=document.createElement("option");o.value=m;o.textContent=m;
-      if(m===PAK){o.disabled=true;}
-      else if(sudahMapel.includes(m)){o.textContent=m+" ✅ Sudah absen";o.disabled=true;}
-      $("mapel").appendChild(o);
-    });
+    listTampil.forEach(m=>$("mapel").appendChild(opsiMapel(m,sudahMapel)));
     $("mapel").value=mapelHariIni[0];
     $("hintMapel").style.display="block";$("hintMapel").textContent=`✨ ${guruVal} hari ini mengajar: ${mapelHariIni.join(" & ")}`;
     isAuto=false;
@@ -247,21 +264,59 @@ $("guru").addEventListener("change",()=>{
 });
 
 /* ================= KETERANGAN IZIN ================= */
-function toggleKet() {
-  const st = document.querySelector('input[name="status"]:checked')?.value;
-  if (st === "Izin") {
-    $("ketBox").style.display = "block";
-  } else {
-    $("ketBox").style.display = "none";
-    $("keterangan").value = "";
-    $("ketCount").textContent = "0";
+function toggleKet(){
+  const st=document.querySelector('input[name="status"]:checked')?.value;
+  if(st==="Izin"){
+    $("ketBox").style.display="block";
+  }else{
+    $("ketBox").style.display="none";
+    $("keterangan").value="";
+    $("ketCount").textContent="0";
   }
 }
-document.querySelectorAll('input[name="status"]').forEach(r => r.addEventListener("change", toggleKet));
-$("keterangan").addEventListener("input", () => { $("ketCount").textContent = $("keterangan").value.length; });
+document.querySelectorAll('input[name="status"]').forEach(r=>r.addEventListener("change",toggleKet));
+$("keterangan").addEventListener("input",()=>{$("ketCount").textContent=$("keterangan").value.length;});
+
+/* ================= PREVIEW QR + IDENTITAS ================= */
+let urlPreview=null;
+
+function setPreview(src,state,teks){
+  $("qrPreview").style.display="block";
+  if(src)$("qrImg").src=src;
+  const fr=$("qrFrame");
+  fr.classList.remove("scanning","ok","bad");
+  if(state)fr.classList.add(state);
+  $("scanBadge").textContent=teks||"";
+}
+
+function isiIdentitas(o){
+  $("outNama").textContent=o.nama||"-";
+  $("outKelas").textContent=o.kelas||"-";
+  $("outPanggilan").textContent=o.panggilan||"-";
+  $("outId").textContent=maskId(o.kode);
+  $("identitas").classList.add("ok");
+}
+
+function resetIdentitas(){
+  kelasAktif="";namaAktif="";kodeAktif="";agamaAktif="Islam";
+  ["outNama","outKelas","outPanggilan","outId"].forEach(id=>$(id).textContent="-");
+  $("identitas").classList.remove("ok");
+  $("hintNama").style.display="none";
+}
 
 /* ================= SCAN QR ================= */
 let scanner=null;
+
+function ambilFrame(){
+  const v=document.querySelector("#reader video");
+  if(!v||!v.videoWidth)return null;
+  try{
+    const sz=Math.min(v.videoWidth,v.videoHeight);
+    const c=document.createElement("canvas");c.width=c.height=400;
+    c.getContext("2d").drawImage(v,(v.videoWidth-sz)/2,(v.videoHeight-sz)/2,sz,sz,0,0,400,400);
+    return c.toDataURL("image/jpeg",.85);
+  }catch(e){return null;}
+}
 
 async function bukaScan(){
   if(typeof Html5Qrcode==="undefined"){toast("Library scanner belum termuat, cek internet");return;}
@@ -270,8 +325,8 @@ async function bukaScan(){
   const sc=new Html5Qrcode("reader");
   scanner=sc;
   try{
-    await sc.start({facingMode:"environment"},{fps:10,qrbox:{width:230,height:230}},onScanOK,()=>{
-    });
+    await sc.start({facingMode:"environment"},{fps:10,qrbox:{width:230,height:230}},
+      t=>{ if(sedangProses)return; onScanOK(t,ambilFrame()); },()=>{});
   }catch(e){
     scanner=null;
     $("reader").innerHTML='<div class="camErr">Kamera tidak aktif.<br>Izinkan akses kamera, atau pilih foto QR dari galeri (ikon gambar).</div>';
@@ -284,39 +339,62 @@ async function tutupScan(){
   $("readerBox").style.display="none";
 }
 
-function resetIdentitas(){
-  kelasAktif="";namaAktif="";kodeAktif="";
-  $("outNama").textContent="-";$("outKelas").textContent="-";
-  $("identitas").classList.remove("ok");
-}
-
 let sedangProses=false;
-async function onScanOK(teks){
+async function onScanOK(teks,src){
   if(sedangProses)return;
   sedangProses=true;
+  const mulai=Date.now();
   await tutupScan();
+  resetIdentitas();
+  kunciForm(true,"🔍 Memverifikasi QR...");
+  setPreview(src,"scanning","🔍 Memindai QR...");
+  $("success").style.display="none";
   try{
     const kode=String(teks).trim();
-    const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/cek_qr`,{method:"POST",headers:JSONH,body:JSON.stringify({p_kode:kode,p_device:DEVICE_ID})});
+
+    // QR guru: hanya tampilan, tidak ke database
+    if(kode.toUpperCase().startsWith("ACE-GURU")){
+      await sleep(Math.max(0,1600-(Date.now()-mulai)));
+      setPreview(null,"ok","✅ QR Guru");
+      isiIdentitas({nama:"kamu seorang guru😁🙏🏻",kelas:"-",panggilan:"Guru",kode});
+      $("btnScan").textContent="📷 Scan Ulang";
+      kunciForm(true,"👨‍🏫 QR guru hanya tampilan, tidak mengisi absen");
+      toast("kamu seorang guru😁🙏🏻",4000);
+      return;
+    }
+
+    const [res]=await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/rpc/cek_qr`,{method:"POST",headers:JSONH,body:JSON.stringify({p_kode:kode,p_device:DEVICE_ID})}),
+      sleep(1600)
+    ]);
     const data=await res.json();
     if(!res.ok){
+      setPreview(null,"bad","❌ Ditolak");
+      kunciForm(true,"🔒 Scan QR yang valid untuk membuka form");
       toast("❌ "+(data&&data.message?data.message:"QR tidak dikenali"),5000);
-      resetIdentitas();return;
+      return;
     }
-    if(!Array.isArray(data)||data.length===0){toast("❌ QR tidak dikenali");resetIdentitas();return;}
-    const {kelas,nama}=data[0];
-    if(!KONFIG_KELAS[kelas]){toast(`❌ Kelas ${kelas} belum diatur`);resetIdentitas();return;}
-    kelasAktif=kelas;namaAktif=nama;kodeAktif=kode.toUpperCase();
-    $("outNama").textContent=nama;$("outKelas").textContent=kelas;
-    $("identitas").classList.add("ok");
+    if(!Array.isArray(data)||data.length===0){
+      setPreview(null,"bad","❌ Tidak dikenali");
+      kunciForm(true,"🔒 Scan QR yang valid untuk membuka form");
+      toast("❌ QR tidak dikenali");return;
+    }
+    const {kelas,nama,panggilan,agama}=data[0];
+    if(!KONFIG_KELAS[kelas]){
+      setPreview(null,"bad","❌ Kelas belum diatur");
+      kunciForm(true,"🔒 Kelas belum diatur");
+      toast(`❌ Kelas ${kelas} belum diatur`);return;
+    }
+    kelasAktif=kelas;namaAktif=nama;kodeAktif=kode.toUpperCase();agamaAktif=agama||"Islam";
+    isiIdentitas({nama,kelas,panggilan,kode:kodeAktif});
+    setPreview(null,"ok","✅ Terverifikasi");
     $("btnScan").textContent="📷 Scan Ulang";
-    $("success").style.display="none";
-    document.querySelectorAll('input[name="status"]').forEach(r=>r.checked=false);
-    toggleKet();
     await loadAbsenHariIni();
     await renderMapelHari();
-    toast(`Halo ${nama}! Pilih mapel & status`);
+    toast(`Halo ${panggilan||nama}! Pilih mapel & status`);
   }catch(e){
+    setPreview(null,"bad","❌ Gagal");
+    kunciForm(true,"🔒 Scan QR dulu untuk membuka form");
     toast("Gagal cek QR: "+e.message,4000);
   }finally{
     sedangProses=false;
@@ -333,12 +411,17 @@ $("fileQR").addEventListener("change",async e=>{
   e.target.value="";
   if(!f)return;
   await tutupScan();
+  if(urlPreview)URL.revokeObjectURL(urlPreview);
+  urlPreview=URL.createObjectURL(f);
   try{
     const h=new Html5Qrcode("reader");
     const teks=await h.scanFile(f,false);
     try{h.clear();}catch(_){}
-    onScanOK(teks);
+    onScanOK(teks,urlPreview);
   }catch(err){
+    resetIdentitas();
+    kunciForm(true,"🔒 Scan QR yang valid untuk membuka form");
+    setPreview(urlPreview,"bad","❌ QR tidak terbaca");
     toast("❌ QR tidak terbaca dari foto itu",4000);
   }
 });
@@ -353,6 +436,7 @@ $("form").addEventListener("submit",async e=>{
   if(!kodeAktif||!namaAktif){toast("📷 Scan QR kertas dulu!");return;}
   if(!mapel||!guru||!status){toast("Lengkapi mapel, guru & status!");return;}
   if(mapel===PAK){toast(`❌ ${PAK} tidak bisa diabsen`);return;}
+  if(mapel===PAI&&agamaAktif==="Nonis"){toast("🔒 PAI khusus siswa Islam");return;}
   if(status==="Izin" && ket.length<5){
     toast("✍️ Tulis keterangan izin (minimal 5 huruf)",4000);
     $("keterangan").focus();
@@ -390,5 +474,5 @@ $("form").addEventListener("submit",async e=>{
 });
 
 /* ================= AWAL ================= */
-$("mapel").disabled=true;$("guru").disabled=true;$("send").disabled=true;
+kunciForm(true);
 window.addEventListener("load",()=>{bukaScan();});
