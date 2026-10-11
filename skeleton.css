@@ -1,0 +1,23 @@
+/* skeleton.css : dipakai index.html, cetak.html, editor.html */
+.sk{
+  background-color:#e9e5f5!important;
+  background-image:linear-gradient(90deg,#e9e5f5 25%,#f8f6ff 50%,#e9e5f5 75%)!important;
+  background-size:200% 100%!important;
+  animation:skMove 1.3s linear infinite;
+  color:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+  pointer-events:none;
+  user-select:none;
+}
+.sk>*{visibility:hidden}
+select.sk{-webkit-appearance:none;appearance:none}
+@keyframes skMove{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.sk-line{height:14px;margin:8px 0;border-radius:8px}
+.sk-in{height:44px;margin-bottom:8px;border-radius:10px}
+.sk-card{aspect-ratio:2/3;border-radius:18px}
+.sk-btn{height:40px;margin-top:8px;border-radius:12px}
+.sk-cam{height:260px;border-radius:0;background-color:#2a2550!important;background-image:linear-gradient(90deg,#2a2550 25%,#3b3470 50%,#2a2550 75%)!important}
+
+@media (prefers-reduced-motion:reduce){.sk{animation:none}}

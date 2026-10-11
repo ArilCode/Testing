@@ -277,6 +277,11 @@ function toggleKet(){
 document.querySelectorAll('input[name="status"]').forEach(r=>r.addEventListener("change",toggleKet));
 $("keterangan").addEventListener("input",()=>{$("ketCount").textContent=$("keterangan").value.length;});
 
+/* ================= SKELETON ================= */
+const SK_IDS=["outNama","outKelas","outPanggilan","outId","jadwalInfo","mapel","guru"];
+function skeletonOn(){SK_IDS.forEach(id=>$(id).classList.add("sk"));}
+function skeletonOff(){SK_IDS.forEach(id=>$(id).classList.remove("sk"));}
+
 /* ================= PREVIEW QR + IDENTITAS ================= */
 let urlPreview=null;
 
@@ -322,6 +327,7 @@ async function bukaScan(){
   if(typeof Html5Qrcode==="undefined"){toast("Library scanner belum termuat, cek internet");return;}
   if(scanner)return;
   $("readerBox").style.display="block";
+  $("camSk").style.display="block";          // skeleton selagi kamera menyala
   const sc=new Html5Qrcode("reader");
   scanner=sc;
   try{
@@ -330,6 +336,8 @@ async function bukaScan(){
   }catch(e){
     scanner=null;
     $("reader").innerHTML='<div class="camErr">Kamera tidak aktif.<br>Izinkan akses kamera, atau pilih foto QR dari galeri (ikon gambar).</div>';
+  }finally{
+    $("camSk").style.display="none";
   }
 }
 
@@ -347,6 +355,7 @@ async function onScanOK(teks,src){
   await tutupScan();
   resetIdentitas();
   kunciForm(true,"🔍 Memverifikasi QR...");
+    skeletonOn();
   setPreview(src,"scanning","🔍 Memindai QR...");
   $("success").style.display="none";
   try{
@@ -396,12 +405,36 @@ async function onScanOK(teks,src){
     setPreview(null,"bad","❌ Gagal");
     kunciForm(true,"🔒 Scan QR dulu untuk membuka form");
     toast("Gagal cek QR: "+e.message,4000);
-  }finally{
-    sedangProses=false;
+  } finally {
+    skeletonOff();
+    sedangProses = false;
   }
 }
 
-$("btnScan").addEventListener("click",bukaScan);
+/* Scan Ulang: bersihkan foto QR, identitas, jadwal, dan kunci form lagi */
+function resetTampilan(){
+  resetIdentitas();
+  $("qrPreview").style.display="none";
+  $("qrImg").removeAttribute("src");
+  $("qrFrame").classList.remove("scanning","ok","bad");
+  $("scanBadge").textContent="";
+  if(urlPreview){URL.revokeObjectURL(urlPreview);urlPreview=null;}
+
+  $("success").style.display="none";
+  $("jadwalInfo").classList.remove("liburBox");
+  $("jadwalInfo").textContent="Scan QR kertas untuk melihat jadwal hari ini";
+  $("mapel").innerHTML='<option value="">-- Scan QR Dulu --</option>';
+  $("guru").innerHTML='<option value="">-- Scan QR Dulu --</option>';
+  $("hintMapel").style.display="none";
+  $("hintGuru").style.display="none";
+  $("btnScan").textContent="📷 Scan QR Kertas";
+  kunciForm(true);
+}
+
+$("btnScan").addEventListener("click",()=>{
+  resetTampilan();
+  bukaScan();
+});
 $("btnTutupScan").addEventListener("click",tutupScan);
 
 /* scan dari galeri */
