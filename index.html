@@ -28,11 +28,36 @@
 <meta name="apple-mobile-web-app-title" content="Absensi SMANDA" />
 <link rel="manifest" href="./site.webmanifest" />
 <link rel="stylesheet" href="./skeleton.css">
+<noscript><style>.wrap.loading>*:not(#pageSk){visibility:visible!important}#pageSk{display:none}</style></noscript>
 <link rel="stylesheet" href="./style.css" />
 <title>Absensi Siswa/i</title>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap loading">
+  <div id="pageSk" aria-hidden="true">
+  <div class="sk psk-hero"></div>
+  <div class="psk-card">
+    <div class="sk psk-title"></div>
+    <div class="sk psk-btn"></div>
+    <div class="psk-id">
+      <div class="sk full"></div>
+      <div class="sk"></div>
+      <div class="sk"></div>
+      <div class="sk full"></div>
+    </div>
+    <div class="sk psk-jadwal"></div>
+    <div class="sk sk-line" style="width:42%"></div>
+    <div class="sk sk-in"></div>
+    <div class="sk sk-line" style="width:34%"></div>
+    <div class="sk sk-in"></div>
+    <div class="sk sk-line" style="width:48%"></div>
+    <div class="psk-status">
+      <div class="sk"></div><div class="sk"></div><div class="sk"></div>
+    </div>
+    <div class="sk psk-send"></div>
+  </div>
+  <div class="sk psk-foot"></div>
+</div>
 <header class="hero">
 <div class="brand">ACE • SMANDA</div>
 <h1>Absensi Siswa 📚</h1><p>Scan QR kertas milikmu untuk absen</p>
@@ -100,12 +125,65 @@
 <button class="send" id="send" type="submit">Kirim Absensi</button>
 <div class="success" id="success"></div>
 </form>
+
+<form id="formKhusus" style="display:none">
+  <div class="khususBanner">🛡️ Mode Wewenang: <b id="kLabel">-</b><small>Absen untuk orang lain</small></div>
+
+  <label class="title">Kelas</label>
+  <select id="kKelas">
+    <option value="SEMUA">Semua Kelas</option>
+    <option value="X E">X E</option>
+    <option value="XI F">XI F</option>
+    <option value="XII MIPA">XII MIPA</option>
+  </select>
+
+  <label class="title">Nama Siswa</label>
+  <select id="kNama"><option value="SEMUA">Semua siswa</option></select>
+
+  <label class="title">Mata Pelajaran</label>
+  <select id="kMapel"><option value="SEMUA">Semua mapel</option></select>
+  <div id="kInfo" class="auto-hint"></div>
+
+  <label class="title">Status Kehadiran</label>
+  <div class="status three">
+    <label class="opt"><input type="radio" name="statusK" value="Hadir"><span>✅ Hadir</span></label>
+    <label class="opt"><input type="radio" name="statusK" value="Izin"><span>📩 Izin</span></label>
+    <label class="opt"><input type="radio" name="statusK" value="Sakit"><span>🤒 Sakit</span></label>
+  </div>
+
+  <div id="ketBoxK" class="ketBox">
+    <label class="title" for="ketK">Keterangan Izin</label>
+    <textarea id="ketK" maxlength="200" rows="3" placeholder="Tulis alasan izin"></textarea>
+    <div class="ketHint"><span id="ketCountK">0</span>/200</div>
+  </div>
+
+  <button class="send" id="kSend" type="submit">Kirim Absensi (Wewenang)</button>
+  <div class="success" id="kSuccess"></div>
+</form>
+
 <p class="note">data tersimpan di DataBase</p>
 </section>
-<div class="footer">© <script>document.write(new Date().getFullYear())</script> • Made with 🖤 by ACE (ArilCode Engineer)</div>
+<div class="footer">© <script>document.write(new Date().getFullYear())</script> • Made with by ACE (ArilCode Engineer)</div>
 </div>
 <div id="toast"></div>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="./main.js"></script>
+<script src="./khusus.js"></script>
+<script>
+(function(){
+  var w=document.querySelector(".wrap");
+  var t0=Date.now();
+  function selesai(){
+    var sisa=Math.max(0,900-(Date.now()-t0));
+    setTimeout(function(){
+      if(w)w.classList.remove("loading");
+      var s=document.getElementById("pageSk");
+      if(s){s.classList.add("out");setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},400);}
+    },sisa);
+  }
+  if(document.readyState==="complete")selesai();else window.addEventListener("load",selesai);
+  setTimeout(selesai,6000);   // pengaman: paling lama 6 detik
+})();
+</script>
 </body>
 </html>

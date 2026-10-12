@@ -303,6 +303,7 @@ function isiIdentitas(o){
 }
 
 function resetIdentitas(){
+  if(typeof tutupKhusus==="function")tutupKhusus();
   kelasAktif="";namaAktif="";kodeAktif="";agamaAktif="Islam";
   ["outNama","outKelas","outPanggilan","outId"].forEach(id=>$(id).textContent="-");
   $("identitas").classList.remove("ok");
@@ -369,6 +370,12 @@ async function onScanOK(teks,src){
       $("btnScan").textContent="📷 Scan Ulang";
       kunciForm(true,"👨‍🏫 QR guru hanya tampilan, tidak mengisi absen");
       toast("kamu seorang guru😁🙏🏻",4000);
+      return;
+    }
+    
+        // QR wewenang: mode absen orang lain (diproses di khusus.js)
+    if (/^ACX-/i.test(kode)) {
+      await mulaiKhusus(kode, mulai);
       return;
     }
 

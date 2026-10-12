@@ -21,3 +21,23 @@ select.sk{-webkit-appearance:none;appearance:none}
 .sk-cam{height:260px;border-radius:0;background-color:#2a2550!important;background-image:linear-gradient(90deg,#2a2550 25%,#3b3470 50%,#2a2550 75%)!important}
 
 @media (prefers-reduced-motion:reduce){.sk{animation:none}}
+
+/* ===== Skeleton halaman penuh (index.html) ===== */
+.wrap{position:relative}
+.wrap.loading>*:not(#pageSk){visibility:hidden}
+
+#pageSk{position:absolute;top:0;left:0;right:0;z-index:20;transition:opacity .35s ease}
+#pageSk.out{opacity:0;pointer-events:none}
+
+.psk-hero{height:196px;border-radius:24px;margin-bottom:16px}
+.psk-card{background:#fff;border-radius:21px;padding:21px;margin-bottom:15px;box-shadow:0 8px 25px #312e8110}
+.psk-title{height:22px;width:48%;border-radius:8px;margin-bottom:16px}
+.psk-btn{height:50px;border-radius:12px;margin-bottom:12px}
+.psk-id{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.psk-id .full{grid-column:1/-1}
+.psk-id .sk{height:46px;border-radius:12px}
+.psk-jadwal{height:58px;border-radius:12px;margin-bottom:14px}
+.psk-status{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:6px 0 16px}
+.psk-status .sk{height:46px;border-radius:13px}
+.psk-send{height:52px;border-radius:12px}
+.psk-foot{height:14px;width:60%;margin:18px auto 30px;border-radius:8px}
