@@ -39,7 +39,7 @@ async function mulaiKhusus(kode,mulai){
   const label=(data&&data[0]&&data[0].label)||"Wewenang";
   khususKode=kode.toUpperCase();
   setPreview(null,"ok","✅ QR Wewenang");
-  isiIdentitas({nama:label,kelas:"Semua kelas",panggilan:"Wewenang",kode:khususKode});
+  isiIdentitas({nama:label,kelas:"Semua kelas",panggilan:"Wewenang",kode:khususKode.split(".")[0]});
   $("btnScan").textContent="📷 Scan Ulang";
 
   const libur=await cekLibur();
