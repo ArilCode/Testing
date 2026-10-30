@@ -106,7 +106,7 @@ footer{text-align:center;color:var(--mute);font-size:13px;padding:0 20px 32px}
   <div><h2>Kontrol sederhana</h2><p>Mikrofon, kamera, dan bagikan layar ada di satu baris di bawah video.</p></div>
   <div><h2>Nyaman di HP</h2><p>Tampilan menyesuaikan layar kecil dan mengikuti tema terang atau gelap.</p></div>
 </section>
-<footer>Ini tampilan demo. Untuk rapat sungguhan dengan banyak orang, tambahkan layanan video seperti WebRTC, Jitsi, atau LiveKit.</footer>
+<footer>Rapat memakai Jitsi Meet (gratis, tanpa akun). Bagikan tautan ke temanmu supaya masuk ke ruang yang sama.</footer>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -119,7 +119,7 @@ $('kode').value=makeCode();
 $('buat').onclick=function(){$('kode').value=makeCode()};
 $('nama').oninput=function(){var n=this.value.trim()||'Kamu';$('selfName').textContent=n;$('selfAv').textContent=n[0].toUpperCase()};
 $('salin').onclick=function(){
-  var link=location.href.split('#')[0]+'#'+$('kode').value;
+  var link=roomUrl();
   if(navigator.clipboard){navigator.clipboard.writeText(link).then(function(){toast('Tautan disalin')},function(){toast('Gagal menyalin')})}else{toast('Salin manual: '+link)}
 };
 function fmt(s){var m=Math.floor(s/60),x=s%60;return (m<10?'0':'')+m+':'+(x<10?'0':'')+x}
@@ -133,13 +133,17 @@ async function startCam(){
     return false;
   }
 }
-$('mulai').onclick=async function(){
-  if(!$('nama').value.trim()){$('info').textContent='Isi nama dulu, ya.';$('nama').focus();return}
-  if(!$('kode').value.trim()){$('info').textContent='Isi atau buat kode rapat dulu.';return}
-  $('stat').textContent='Rapat berlangsung · '+$('kode').value;
-  if(!stream)await startCam();
+function roomUrl(){var k=($('kode').value||'').trim().toLowerCase().replace(/[^a-z0-9-]/g,'');return 'https://meet.jit.si/RuangTemu-'+k}
+$('mulai').onclick=function(){
+  var n=$('nama').value.trim(),k=$('kode').value.trim();
+  if(!n){$('info').textContent='Isi nama dulu, ya.';$('nama').focus();return}
+  if(!k){$('info').textContent='Isi atau buat kode rapat dulu.';return}
+  var url=roomUrl()+'#userInfo.displayName=%22'+encodeURIComponent(n)+'%22';
+  $('grid').innerHTML='<iframe title="Rapat video" src="'+url+'" allow="camera; microphone; display-capture; fullscreen; autoplay" style="grid-column:1/-1;width:100%;height:min(70vh,520px);border:0;border-radius:14px;background:#000"></iframe>';
+  ['mic','cam','bagi'].forEach(function(i){$(i).style.display='none'});
+  $('stat').textContent='Rapat berlangsung · '+k;
   if(!tick){t0=Date.now();tick=setInterval(function(){$('timer').textContent=fmt(Math.floor((Date.now()-t0)/1000))},1000)}
-  $('info').textContent='Kamu sudah di dalam rapat.';
+  $('info').innerHTML='Kalau video tidak muncul, <a href="'+url+'" target="_blank" rel="noopener">buka di tab baru</a>.';
 };
 $('mic').onclick=function(){
   var off=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',off);
@@ -161,7 +165,7 @@ $('bagi').onclick=async function(){
     toast('Layar dibagikan');
   }catch(e){toast('Bagikan layar tidak tersedia di perangkat ini')}
 };
-$('akhir').onclick=function(){
+$('akhir').onclick=function(){location.reload();
   if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}
   $('vid').hidden=true;$('selfAv').hidden=false;
   clearInterval(tick);tick=null;$('timer').textContent='00:00';
