@@ -1,189 +1,182 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="ACE • STUDENT SYSTEM - Absensi Digital" />
-
-<!-- Primary Meta Tags -->
-<meta name="title" content="Absensi Siswa 📚">
-
-<!-- Open Graph / Facebook / LinkedIn -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://ab-ace.vercel.app/">
-<meta property="og:title" content="Absensi Siswa 📚">
-<meta property="og:description" content="ACE • STUDENT SYSTEM - Absensi Digital">
-<meta property="og:image" content="https://ab-ace.vercel.app/og-image.png?v=4">
-
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://ab-ace.vercel.app/">
-<meta property="twitter:title" content="Absensi Siswa 📚">
-<meta property="twitter:description" content="ACE • STUDENT SYSTEM - Absensi Digital">
-<meta property="twitter:image" content="https://ab-ace.vercel.app/og-image.png?v=4">
-
-<link rel="icon" type="image/png" href="./images/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="./images/favicon.svg" />
-<link rel="shortcut icon" href="./images/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="Absensi SMANDA" />
-<link rel="manifest" href="./site.webmanifest" />
-<link rel="stylesheet" href="./skeleton.css">
-<noscript><style>.wrap.loading>*:not(#pageSk){visibility:visible!important}#pageSk{display:none}</style></noscript>
-<link rel="stylesheet" href="./style.css" />
-<title>Absensi Siswa/i</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ruang Temu – Rapat Video Online</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#0f1a2b;--panel:#182a42;--panel2:#20375a;--text:#eaf0f8;--mute:#9fb2cc;--accent:#2d8cff;--accent-ink:#fff;--warm:#ffc857;--danger:#ff5d5d;--line:#2b4468;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f1f5fb;--panel:#fff;--panel2:#dfeaf9;--text:#10213a;--mute:#52688a;--line:#c9d7ea}}
+:root[data-theme="light"]{--bg:#f1f5fb;--panel:#fff;--panel2:#dfeaf9;--text:#10213a;--mute:#52688a;--line:#c9d7ea}
+:root[data-theme="dark"]{--bg:#0f1a2b;--panel:#182a42;--panel2:#20375a;--text:#eaf0f8;--mute:#9fb2cc;--line:#2b4468}
+*{box-sizing:border-box;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--text);font:400 16px/1.55 Figtree,system-ui,sans-serif;min-height:100vh}
+h1,h2{font-family:"Bricolage Grotesque",Figtree,sans-serif;line-height:1.05;letter-spacing:-.02em}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--warm);outline-offset:2px}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;max-width:1120px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:10px;font:800 20px "Bricolage Grotesque",sans-serif}
+.logo i{width:34px;height:34px;border-radius:10px;background:var(--accent);display:grid;place-items:center}
+.logo svg{width:20px;height:20px;fill:#fff}
+main{max-width:1120px;margin:0 auto;padding:12px 20px 56px;display:grid;grid-template-columns:1fr 1.15fr;gap:40px;align-items:center}
+.lead h1{font-size:clamp(38px,6vw,64px);font-weight:800}
+.lead p{color:var(--mute);margin:18px 0 26px;max-width:46ch}
+.join{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:12px;max-width:440px}
+label{font-weight:600;font-size:14px}
+input{width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit}
+.row{display:flex;gap:10px}
+button{font:600 15px Figtree,sans-serif;border:0;border-radius:10px;padding:13px 18px;cursor:pointer;color:var(--text);background:var(--panel2)}
+button.primary{background:var(--accent);color:var(--accent-ink)}
+button:active{transform:scale(.97)}
+.hint{font-size:13px;color:var(--mute)}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:14px;display:grid;gap:12px}
+.bar{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--mute);padding:2px 6px}
+.live{display:flex;align-items:center;gap:8px}
+.live b{width:9px;height:9px;border-radius:50%;background:var(--danger);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{position:relative;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:var(--panel2);display:grid;place-items:center}
+.tile.big{grid-column:1/-1;aspect-ratio:16/9}
+.av{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font:700 24px "Bricolage Grotesque",sans-serif;color:#10213a}
+.name{position:absolute;left:8px;bottom:8px;background:rgba(10,20,35,.72);color:#fff;font-size:12px;padding:3px 9px;border-radius:99px}
+.tile video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.speak{outline:3px solid var(--warm);outline-offset:-3px;transition:outline-color .3s}
+.ctrls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.ctrls button{display:flex;align-items:center;gap:8px}
+.ctrls button[aria-pressed="true"]{background:var(--danger);color:#fff}
+.ctrls .end{background:var(--danger);color:#fff}
+.feat{max-width:1120px;margin:0 auto;padding:0 20px 56px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feat div{border-top:2px solid var(--accent);padding-top:12px}
+.feat h2{font-size:22px;margin-bottom:6px}
+.feat p{color:var(--mute);font-size:15px}
+footer{text-align:center;color:var(--mute);font-size:13px;padding:0 20px 32px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:99px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s}
+.toast.on{opacity:1}
+@media (max-width:860px){main{grid-template-columns:1fr;gap:28px}.feat{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
-<div class="wrap loading">
-  <div id="pageSk" aria-hidden="true">
-  <div class="sk psk-hero"></div>
-  <div class="psk-card">
-    <div class="sk psk-title"></div>
-    <div class="sk psk-btn"></div>
-    <div class="psk-id">
-      <div class="sk full"></div>
-      <div class="sk"></div>
-      <div class="sk"></div>
-      <div class="sk full"></div>
-    </div>
-    <div class="sk psk-jadwal"></div>
-    <div class="sk sk-line" style="width:42%"></div>
-    <div class="sk sk-in"></div>
-    <div class="sk sk-line" style="width:34%"></div>
-    <div class="sk sk-in"></div>
-    <div class="sk sk-line" style="width:48%"></div>
-    <div class="psk-status">
-      <div class="sk"></div><div class="sk"></div><div class="sk"></div>
-    </div>
-    <div class="sk psk-send"></div>
-  </div>
-  <div class="sk psk-foot"></div>
-</div>
-<header class="hero">
-<div class="brand">ACE • SMANDA</div>
-<h1>Absensi Siswa 📚</h1><p>Scan QR kertas milikmu untuk absen</p>
-<div class="clock"><div id="time">--:--:--</div><div id="date">Memuat tanggal...</div><span class="wib">🌏 Waktu Indonesia Barat (WIB)</span></div>
+<header>
+  <div class="logo"><i><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2.5l5-3v11l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></i>Ruang Temu</div>
+  <button id="theme" aria-label="Ganti tema">Ganti tema</button>
 </header>
-<section class="card">
-<h2>📝 Form Absensi</h2>
 
-<button type="button" class="scanBtn" id="btnScan">📷 Scan QR Kertas</button>
-<div id="readerBox" class="readerBox">
-  <div class="camTools">
-    <button type="button" class="iconBtn" id="btnGaleri" aria-label="Pilih dari galeri">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-    </button>
-    <button type="button" class="iconBtn" id="btnTutupScan" aria-label="Tutup">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-    </button>
-  </div>
-  <div id="camSk" class="sk sk-cam" style="display:none"></div>
-  <div id="reader"></div>
-</div>
-<input type="file" id="fileQR" accept="image/*" hidden>
+<main>
+  <section class="lead">
+    <h1>Rapat online yang langsung jalan.</h1>
+    <p>Buat ruang, bagikan kode, dan mulai bicara. Cocok untuk kelas, rapat tim, atau belajar bareng teman.</p>
+    <div class="join">
+      <label for="nama">Nama kamu</label>
+      <input id="nama" placeholder="Contoh: Aril" autocomplete="name">
+      <label for="kode">Kode rapat</label>
+      <div class="row">
+        <input id="kode" placeholder="abc-defg-hij" autocapitalize="off">
+        <button id="buat" type="button">Buat kode</button>
+      </div>
+      <div class="row">
+        <button class="primary" id="mulai" type="button" style="flex:1">Masuk rapat</button>
+        <button id="salin" type="button">Salin tautan</button>
+      </div>
+      <p class="hint" id="info">Kamera dan mikrofon hanya aktif setelah kamu izinkan.</p>
+    </div>
+  </section>
 
-<div id="qrPreview" class="qrPreview">
-  <div id="qrFrame" class="qrFrame">
-    <img id="qrImg" alt="QR yang dipindai">
-    <div class="scanLine"></div>
-    <div id="scanBadge" class="scanBadge"></div>
-  </div>
-</div>
+  <section class="stage" aria-label="Pratinjau ruang rapat">
+    <div class="bar"><span class="live"><b></b><span id="stat">Pratinjau</span></span><span id="timer">00:00</span></div>
+    <div class="grid" id="grid">
+      <div class="tile big" id="selfTile"><video id="vid" autoplay muted playsinline hidden></video><div class="av" id="selfAv" style="background:#ffc857">K</div><span class="name" id="selfName">Kamu</span></div>
+      <div class="tile" data-s><div class="av" style="background:#7fd1ae">R</div><span class="name">Rina</span></div>
+      <div class="tile" data-s><div class="av" style="background:#f19ab8">D</div><span class="name">Dimas</span></div>
+    </div>
+    <div class="ctrls">
+      <button id="mic" aria-pressed="false" type="button">Mikrofon</button>
+      <button id="cam" aria-pressed="true" type="button">Kamera</button>
+      <button id="bagi" type="button">Bagikan layar</button>
+      <button class="end" id="akhir" type="button">Keluar</button>
+    </div>
+  </section>
+</main>
 
-<div id="identitas" class="identitas">
-  <div class="c2"><small>NAMA</small><b id="outNama">-</b></div>
-  <div><small>KELAS</small><b id="outKelas">-</b></div>
-  <div><small>PANGGILAN</small><b id="outPanggilan">-</b></div>
-  <div class="c2"><small>ID</small><b id="outId" class="mono">-</b></div>
-</div>
-<div id="hintNama" class="auto-hint"></div>
-
-<div id="jadwalInfo" class="jadwalBox">Scan QR kertas untuk melihat jadwal hari ini</div>
-
-<div id="lockHint" class="lockHint">🔒 Scan QR dulu untuk membuka form</div>
-<form id="form" class="locked">
-<label class="title">Mata Pelajaran</label>
-<select id="mapel" required><option value="">-- Scan QR Dulu --</option></select>
-<div id="hintMapel" class="auto-hint"></div>
-
-<label class="title">Guru Mapel</label>
-<select id="guru" required><option value="">-- Scan QR Dulu --</option></select>
-<div id="hintGuru" class="auto-hint"></div>
-
-<label class="title">Status Kehadiran</label>
-<div class="status three">
-<label class="opt"><input type="radio" name="status" value="Hadir" required><span>✅ Hadir</span></label>
-<label class="opt"><input type="radio" name="status" value="Izin"><span>📩 Izin</span></label>
-<label class="opt"><input type="radio" name="status" value="Sakit"><span>🤒 Sakit</span></label>
-</div>
-
-<div id="ketBox" class="ketBox">
-  <label class="title" for="keterangan">Keterangan Izin</label>
-  <textarea id="keterangan" maxlength="200" rows="3" placeholder="Tulis alasan izin, contoh: acara keluarga"></textarea>
-  <div class="ketHint"><span id="ketCount">0</span>/200</div>
-</div>
-
-<button class="send" id="send" type="submit">Kirim Absensi</button>
-<div class="success" id="success"></div>
-</form>
-
-<form id="formKhusus" style="display:none">
-  <div class="khususBanner">🛡️ Mode Wewenang: <b id="kLabel">-</b><small>Absen untuk orang lain</small></div>
-
-  <label class="title">Kelas</label>
-  <select id="kKelas">
-    <option value="SEMUA">Semua Kelas</option>
-    <option value="X E">X E</option>
-    <option value="XI F">XI F</option>
-    <option value="XII MIPA">XII MIPA</option>
-  </select>
-
-  <label class="title">Nama Siswa</label>
-  <select id="kNama"><option value="SEMUA">Semua siswa</option></select>
-
-  <label class="title">Mata Pelajaran</label>
-  <select id="kMapel"><option value="SEMUA">Semua mapel</option></select>
-  <div id="kInfo" class="auto-hint"></div>
-
-  <label class="title">Status Kehadiran</label>
-  <div class="status three">
-    <label class="opt"><input type="radio" name="statusK" value="Hadir"><span>✅ Hadir</span></label>
-    <label class="opt"><input type="radio" name="statusK" value="Izin"><span>📩 Izin</span></label>
-    <label class="opt"><input type="radio" name="statusK" value="Sakit"><span>🤒 Sakit</span></label>
-  </div>
-
-  <div id="ketBoxK" class="ketBox">
-    <label class="title" for="ketK">Keterangan Izin</label>
-    <textarea id="ketK" maxlength="200" rows="3" placeholder="Tulis alasan izin"></textarea>
-    <div class="ketHint"><span id="ketCountK">0</span>/200</div>
-  </div>
-
-  <button class="send" id="kSend" type="submit">Kirim Absensi (Wewenang)</button>
-  <div class="success" id="kSuccess"></div>
-</form>
-
-<p class="note">data tersimpan di DataBase</p>
+<section class="feat">
+  <div><h2>Satu kode, langsung masuk</h2><p>Tidak perlu akun. Ketik kode rapat dan nama, lalu masuk.</p></div>
+  <div><h2>Kontrol sederhana</h2><p>Mikrofon, kamera, dan bagikan layar ada di satu baris di bawah video.</p></div>
+  <div><h2>Nyaman di HP</h2><p>Tampilan menyesuaikan layar kecil dan mengikuti tema terang atau gelap.</p></div>
 </section>
-<div class="footer">© <script>document.write(new Date().getFullYear())</script> • Made with by ACE (ArilCode Engineer)</div>
-</div>
-<div id="toast"></div>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="./main.js"></script>
-<script src="./khusus.js"></script>
+<footer>Ini tampilan demo. Untuk rapat sungguhan dengan banyak orang, tambahkan layanan video seperti WebRTC, Jitsi, atau LiveKit.</footer>
+<div class="toast" id="toast" role="status"></div>
+
 <script>
-(function(){
-  var w=document.querySelector(".wrap");
-  var t0=Date.now();
-  function selesai(){
-    var sisa=Math.max(0,900-(Date.now()-t0));
-    setTimeout(function(){
-      if(w)w.classList.remove("loading");
-      var s=document.getElementById("pageSk");
-      if(s){s.classList.add("out");setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},400);}
-    },sisa);
+var $=function(i){return document.getElementById(i)};
+var stream=null,t0=null,tick=null;
+function toast(m){var t=$('toast');t.textContent=m;t.className='toast on';setTimeout(function(){t.className='toast'},1800)}
+function rand(n){var c='abcdefghijkmnpqrstuvwxyz',s='';for(var i=0;i<n;i++)s+=c[Math.floor(Math.random()*c.length)];return s}
+function makeCode(){return rand(3)+'-'+rand(4)+'-'+rand(3)}
+$('kode').value=makeCode();
+$('buat').onclick=function(){$('kode').value=makeCode()};
+$('nama').oninput=function(){var n=this.value.trim()||'Kamu';$('selfName').textContent=n;$('selfAv').textContent=n[0].toUpperCase()};
+$('salin').onclick=function(){
+  var link=location.href.split('#')[0]+'#'+$('kode').value;
+  if(navigator.clipboard){navigator.clipboard.writeText(link).then(function(){toast('Tautan disalin')},function(){toast('Gagal menyalin')})}else{toast('Salin manual: '+link)}
+};
+function fmt(s){var m=Math.floor(s/60),x=s%60;return (m<10?'0':'')+m+':'+(x<10?'0':'')+x}
+async function startCam(){
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    $('vid').srcObject=stream;$('vid').hidden=false;$('selfAv').hidden=true;
+    $('cam').setAttribute('aria-pressed','false');return true;
+  }catch(e){
+    $('info').textContent='Kamera tidak bisa diakses. Izinkan kamera di pengaturan browser, lalu coba lagi.';
+    return false;
   }
-  if(document.readyState==="complete")selesai();else window.addEventListener("load",selesai);
-  setTimeout(selesai,6000);   // pengaman: paling lama 6 detik
-})();
+}
+$('mulai').onclick=async function(){
+  if(!$('nama').value.trim()){$('info').textContent='Isi nama dulu, ya.';$('nama').focus();return}
+  if(!$('kode').value.trim()){$('info').textContent='Isi atau buat kode rapat dulu.';return}
+  $('stat').textContent='Rapat berlangsung · '+$('kode').value;
+  if(!stream)await startCam();
+  if(!tick){t0=Date.now();tick=setInterval(function(){$('timer').textContent=fmt(Math.floor((Date.now()-t0)/1000))},1000)}
+  $('info').textContent='Kamu sudah di dalam rapat.';
+};
+$('mic').onclick=function(){
+  var off=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',off);
+  if(stream)stream.getAudioTracks().forEach(function(t){t.enabled=!off});
+  toast(off?'Mikrofon mati':'Mikrofon menyala');
+};
+$('cam').onclick=async function(){
+  var off=this.getAttribute('aria-pressed')!=='true';
+  if(!off&&!stream){await startCam();return}
+  this.setAttribute('aria-pressed',off);
+  if(stream)stream.getVideoTracks().forEach(function(t){t.enabled=!off});
+  $('vid').hidden=off;$('selfAv').hidden=!off;
+  toast(off?'Kamera mati':'Kamera menyala');
+};
+$('bagi').onclick=async function(){
+  try{var s=await navigator.mediaDevices.getDisplayMedia({video:true});
+    $('vid').srcObject=s;$('vid').hidden=false;$('selfAv').hidden=true;$('vid').style.transform='none';
+    s.getVideoTracks()[0].onended=function(){$('vid').srcObject=stream;$('vid').style.transform='scaleX(-1)'};
+    toast('Layar dibagikan');
+  }catch(e){toast('Bagikan layar tidak tersedia di perangkat ini')}
+};
+$('akhir').onclick=function(){
+  if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}
+  $('vid').hidden=true;$('selfAv').hidden=false;
+  clearInterval(tick);tick=null;$('timer').textContent='00:00';
+  $('stat').textContent='Pratinjau';$('cam').setAttribute('aria-pressed','true');
+  $('info').textContent='Kamu sudah keluar dari rapat.';
+};
+setInterval(function(){
+  var t=document.querySelectorAll('[data-s]');t.forEach(function(x){x.classList.remove('speak')});
+  if(tick){t[Math.floor(Math.random()*t.length)].classList.add('speak')}
+},1800);
+$('theme').onclick=function(){
+  var r=document.documentElement,dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#0f1a2b';
+  r.setAttribute('data-theme',dark?'light':'dark');
+};
+if(location.hash.length>1)$('kode').value=location.hash.slice(1);
 </script>
 </body>
 </html>
