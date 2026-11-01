@@ -1,0 +1,34 @@
+{
+  "intro": "Halo! Di video ini aku tunjukkan cara memakai ACE Converter, untuk mengubah foto menjadi file PDF langsung dari HP kamu.",
+  "steps": [
+    ["Pertama, buka browser di HP kamu, lalu ketuk kolom pencarian di bagian tengah layar."],
+    ["Setelah kolom alamat terbuka, keyboard akan muncul. Sekarang kita siap mengetik."],
+    [
+      "Sekarang ketik alamat ini dengan teliti: ace, strip, converter, titik, vercel, titik, app.",
+      "Lalu ketuk saran ACE Converter yang muncul, atau tekan tombol panah biru di keyboard."
+    ],
+    [
+      "Di halaman ACE Converter, pilih jenis konversi sesuai kebutuhan kamu. Pada contoh ini, kita pilih gambar ke PDF.",
+      "Selanjutnya, ketuk tombol Pilih File."
+    ],
+    [
+      "Pilih satu atau dua foto, atau lebih, sesuai kebutuhan kamu.",
+      "Kalau sudah, ketuk tombol Done, atau setuju."
+    ],
+    [
+      "Sekarang atur hasil PDF-nya. Mulai dari orientasi halaman: potret, lanskap, atau otomatis.",
+      "Lalu pilih ukuran kertas. Biasanya A4.",
+      "Berikutnya ukuran margin, yaitu jarak tepi halaman: tanpa, kecil, sedang, atau besar.",
+      "Untuk penempatan gambar, pilih muat utuh supaya seluruh gambar terlihat, atau penuhi area kalau mau dipotong di tepi.",
+      "Terakhir, kualitas dan ukuran file. Pilihan seimbang adalah yang disarankan."
+    ],
+    [
+      "Kamu juga bisa menyalakan atau mematikan watermark logo ACE.",
+      "Bagian pratinjau tata letak menunjukkan seperti apa susunan halamannya.",
+      "Kemudian isi nama file hasil sesuai keinginan kamu.",
+      "Kalau sudah, ketuk Konversi dan Download untuk mengunduh file PDF-nya.",
+      "Atau ketuk Preview untuk melihat contoh hasilnya dulu."
+    ]
+  ],
+  "outro": "Selesai! File PDF kamu sudah siap dipakai. Terima kasih sudah menonton."
+}
