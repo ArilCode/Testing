@@ -59,6 +59,13 @@ button:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 .chip:hover{border-color:var(--acc)}
 .k-dir{color:var(--acc);font-weight:700}.k-html{color:var(--html)}.k-css{color:var(--css)}.k-js{color:var(--js)}.k-img{color:var(--img)}.k-json{color:var(--json)}.k-page{color:var(--mut)}
 .hit{background:var(--warn);color:#000}
+.dl{color:var(--acc);text-decoration:underline;cursor:pointer;font-weight:700}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:20;width:max-content;max-width:min(92vw,420px);background:#020a06;border:1px solid var(--acc);box-shadow:0 0 18px rgba(0,255,127,.45);padding:12px 14px;font-size:.88rem}
+.toast[hidden]{display:none}
+.toast .tmsg{word-break:break-all}
+.toast .tact{display:flex;gap:8px;margin-top:10px;justify-content:flex-end}
+.tb{background:transparent;color:var(--acc);border:1px solid var(--acc);padding:7px 14px;font-weight:700;font-size:.85rem}
+.tb.pri{background:var(--acc);color:var(--accink)}
 /* panel hasil tipe 1 */
 #out[hidden]{display:none}
 .tabs{display:flex;gap:4px;margin:22px 0 14px;border-bottom:1px solid var(--line);overflow-x:auto}
@@ -123,7 +130,7 @@ pre.ascii{background:none;border:0;padding:0;max-height:none;overflow:hidden}
     <p style="margin:0 0 12px"><button class="chip" id="back" data-i18n="backBtn"></button></p>
     <div class="bar">
       <div class="prompt"><span>root@target:~$</span>
-        <input id="u" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-ph="ph" aria-label="URL">
+        <input id="u" type="url" inputmode="url" enterkeyhint="enter" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-ph="ph" aria-label="URL">
       </div>
       <button class="go" id="go" data-i18n="scanBtn"></button>
     </div>
@@ -149,7 +156,7 @@ pre.ascii{background:none;border:0;padding:0;max-height:none;overflow:hidden}
       <div id="tout" role="log" aria-live="polite"></div>
       <form class="tline" id="tform" autocomplete="off">
         <span id="tprompt">root@bongkar:~$</span>
-        <input id="tin" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" aria-label="Terminal">
+        <input id="tin" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="enter" aria-label="Terminal">
       </form>
     </div>
     <div class="chips" id="chips">
@@ -164,12 +171,14 @@ pre.ascii{background:none;border:0;padding:0;max-height:none;overflow:hidden}
     </div>
   </section>
 </main>
+<div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
 
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const kb = n => n == null ? '?' : n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(1) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const APP_VERSION = '1.1.0';
 const store = {};      // url -> {text,type,size}
 let S = null;          // hasil scan terakhir (dipakai tipe 1 dan tipe 2)
 
@@ -184,7 +193,7 @@ id: {
   view:'Lihat isi', copy:'Salin', copied:'Tersalin', copyFail:'Gagal salin', truncated:'… (dipotong, file terlalu panjang)',
   k_html:'HTML', k_css:'CSS', k_js:'JavaScript', k_img:'Gambar', k_json:'Data/manifest', k_page:'Halaman lain',
   // boot & scan
-  bootOnline:'BONGKAR_WEB v1.0 ... online', bootParser:'modul parser DOM ........ [OK]', bootTracker:'modul pelacak file ...... [OK]',
+  bootOnline:'BONGKAR_WEB v{0} ... online', bootParser:'modul parser DOM ........ [OK]', bootTracker:'modul pelacak file ...... [OK]',
   bootWait:'menunggu target. tempel link lalu tekan SCAN_',
   errPrefix:'ERROR: ', errEmpty:'target kosong. isi dulu link webnya.',
   errServer:'Tidak bisa menghubungi server. Pastikan folder api/fetch.js ikut ter-upload.',
@@ -227,7 +236,7 @@ id: {
   // terminal
   tWelcome:"ketik 'help' untuk daftar perintah. 'scan <url>' untuk memindai, 'gui' untuk tipe 1 (tombol Scan).",
   tHaveData:'data dari {0} sudah dimuat. coba: ls',
-  help:"Perintah yang tersedia:\n  help                  tampilkan bantuan ini\n  scan [-y] <url>       pindai sebuah web (konfirmasi y/n, -y = langsung)\n  gui [url]             masuk tipe 1 (tombol Scan); Esc = kembali ke terminal\n  ls [-la] [folder]     lihat isi folder     (ll, la)\n  cd <folder>           pindah folder (cd .. naik, cd - balik, cd ~ root)\n  pwd                   folder sekarang\n  tree [folder]         pohon file\n  cat [-y] <file>       tampilkan isi file   (less, more; -y = tanpa konfirmasi)\n  head|tail <file> [n]  n baris awal / akhir (default 10)\n  grep [-i] <pola> [file]  cari teks di semua file hasil scan\n  find [nama]           cari nama file\n  wc <file>             hitung baris, kata, byte\n  file <file>           jenis file\n  stat <file>           detail sebuah file\n  du                    ukuran file\n  info                  ringkasan, tujuan, teknologi\n  explain               cara kerja web ini\n  rm <file>             coba hapus (read-only, cuma tiruan)\n  history, !!           riwayat perintah / ulangi perintah terakhir\n  lang id|en            ganti bahasa\n  mode 1|2              ganti tipe (1 = gui, 2 = terminal)\n  clear (cl, cls)       bersihkan layar\n  echo, date, whoami, hostname, uname, exit\n<perintah> --help = pemakaian singkat.\nTab = lengkapi otomatis, panah atas/bawah = riwayat, Ctrl+L = clear.",
+  help:"Perintah yang tersedia:\n  help [perintah]       bantuan; contoh: help scan (penjelasan detail)\n  scan [-y] <url>       pindai sebuah web (konfirmasi y/n, -y = langsung)\n  gui [url]             masuk tipe 1 (tombol Scan); Esc = kembali ke terminal\n  ls [-la] [folder]     lihat isi folder     (ll, la)\n  cd <folder>           pindah folder (cd .. naik, cd - balik, cd ~ root)\n  pwd                   folder sekarang\n  tree [folder]         pohon file\n  cat [-y] <file>       tampilkan isi file   (less, more; -y = tanpa konfirmasi)\n  head|tail <file> [n]  n baris awal / akhir (default 10)\n  grep [-i] <pola> [file]  cari teks di semua file hasil scan\n  find [nama]           cari nama file\n  wc <file>             hitung baris, kata, byte\n  file <file>           jenis file\n  stat <file>           detail sebuah file\n  du                    ukuran file\n  download <file>       unduh file hasil scan (klik link, muncul notifikasi, terunduh)\n  info                  ringkasan, tujuan, teknologi\n  explain               cara kerja web ini\n  pkg update|upgrade|list  cek & pasang pembaruan Bongkar Web\n  rm <file>             coba hapus (read-only, cuma tiruan)\n  history, !!           riwayat perintah / ulangi perintah terakhir\n  lang id|en            ganti bahasa\n  mode 1|2              ganti tipe (1 = gui, 2 = terminal)\n  clear (cl, cls)       bersihkan layar\n  echo, date, whoami, hostname, uname, exit\n<perintah> --help = penjelasan perintah itu.\nTab = lengkapi otomatis, panah atas/bawah = riwayat, Ctrl+L = clear.",
   notFound:"{0}: perintah tidak ditemukan. ketik 'help'.",
   didYouMean:'maksudmu: scan {0} ?',
   noData:'belum ada data. jalankan dulu: scan <url>',
@@ -253,7 +262,16 @@ id: {
   modeSet:'pindah ke tipe {0}', modeUsage:'pemakaian: mode 1|2',
   exitMsg:'logout',
   backBtn:'← terminal (Esc)', alreadyTerm:'kamu sudah di terminal (tipe 2). ketik gui untuk tipe 1.',
-  roFs:'{0}: operasi ditolak: sistem file read-only', useScan:'{0}: tidak tersedia di sini. pakai: scan <url>'
+  roFs:'{0}: operasi ditolak: sistem file read-only', useScan:'{0}: tidak tersedia di sini. pakai: scan <url>',
+  dlUsage:'pemakaian: download [-y] <file>', dlLink:'unduh {0} ({1}) — klik di sini', dlAsk:'Unduh {0} ({1}) ke perangkatmu?', dlBtn:'Unduh', cancel:'Batal', dlDone:'✓ {0} terunduh',
+  helpNone:"tidak ada bantuan untuk '{0}'. ketik 'help' untuk daftar.", helpAlias:'alias:', helpEx:'contoh:',
+  pkgUsage:'pemakaian: pkg update | upgrade [-y] | list', pkgReading:'Membaca daftar paket ...',
+  pkgSrvOk:'Hit:1  server fetch (/api/fetch) ... OK', pkgSrvBad:'Err:1  server fetch (/api/fetch) ... tidak terjangkau',
+  pkgRepoOk:'Get:2  bongkar-web {0} ... OK', pkgRepoBad:'Err:2  halaman utama tidak bisa dibaca (offline, atau dibuka dari file lokal?)',
+  pkgUpToDate:'Semua paket sudah versi terbaru ({0}).', pkgNew:'{0} paket bisa ditingkatkan: {1} -> {2}. jalankan: pkg upgrade',
+  pkgAsk:'Pasang bongkar-web {0}? (halaman akan dimuat ulang)', pkgInstall:'Membongkar bongkar-web ({0}) ...', pkgReload:'Selesai. memuat ulang ...',
+  pkgNone:'0 ditingkatkan, 0 dipasang baru.', pkgListH:'Paket terpasang:', pkgM1:'mesin scan & analisis', pkgM2:'terminal & sistem file virtual', pkgM3:'bahasa Indonesia & English',
+  pkgNoPkg:"E: paket '{0}' tidak ditemukan"
 },
 en: {
   m1:'1 · Scan', m2:'2 · Terminal',
@@ -263,7 +281,7 @@ en: {
   codeHint:'Pick a file in the Files tab, then press View.',
   view:'View', copy:'Copy', copied:'Copied', copyFail:'Copy failed', truncated:'… (truncated, file too long)',
   k_html:'HTML', k_css:'CSS', k_js:'JavaScript', k_img:'Image', k_json:'Data/manifest', k_page:'Other page',
-  bootOnline:'BONGKAR_WEB v1.0 ... online', bootParser:'DOM parser module ........ [OK]', bootTracker:'file tracker module ...... [OK]',
+  bootOnline:'BONGKAR_WEB v{0} ... online', bootParser:'DOM parser module ........ [OK]', bootTracker:'file tracker module ...... [OK]',
   bootWait:'waiting for target. paste a link and press SCAN_',
   errPrefix:'ERROR: ', errEmpty:'empty target. enter a link first.',
   errServer:'Cannot reach the server. Make sure api/fetch.js was uploaded.',
@@ -304,7 +322,7 @@ en: {
   noteEmpty:"This page is almost empty from the browser's side. If the site is built with React/Next, its content is created by JavaScript, so this analysis may be incomplete.",
   tWelcome:"type 'help' for the command list. 'scan <url>' to scan, 'gui' for type 1 (Scan button).",
   tHaveData:'data from {0} is already loaded. try: ls',
-  help:"Available commands:\n  help                  show this help\n  scan [-y] <url>       scan a website (asks y/n, -y = skip the question)\n  gui [url]             enter type 1 (Scan button); Esc = back to terminal\n  ls [-la] [folder]     list a folder        (ll, la)\n  cd <folder>           change folder (cd .. up, cd - back, cd ~ root)\n  pwd                   current folder\n  tree [folder]         file tree\n  cat [-y] <file>       print a file         (less, more; -y = no question)\n  head|tail <file> [n]  first / last n lines (default 10)\n  grep [-i] <pattern> [file]  search text in all scanned files\n  find [name]           search file names\n  wc <file>             count lines, words, bytes\n  file <file>           file type\n  stat <file>           details of a file\n  du                    file sizes\n  info                  summary, purpose, technology\n  explain               how this site works\n  rm <file>             try to delete (read-only, just a mock)\n  history, !!           command history / repeat last command\n  lang id|en            change language\n  mode 1|2              change type (1 = gui, 2 = terminal)\n  clear (cl, cls)       clear the screen\n  echo, date, whoami, hostname, uname, exit\n<command> --help = short usage.\nTab = autocomplete, up/down arrows = history, Ctrl+L = clear.",
+  help:"Available commands:\n  help [command]        help; example: help scan (detailed explanation)\n  scan [-y] <url>       scan a website (asks y/n, -y = skip the question)\n  gui [url]             enter type 1 (Scan button); Esc = back to terminal\n  ls [-la] [folder]     list a folder        (ll, la)\n  cd <folder>           change folder (cd .. up, cd - back, cd ~ root)\n  pwd                   current folder\n  tree [folder]         file tree\n  cat [-y] <file>       print a file         (less, more; -y = no question)\n  head|tail <file> [n]  first / last n lines (default 10)\n  grep [-i] <pattern> [file]  search text in all scanned files\n  find [name]           search file names\n  wc <file>             count lines, words, bytes\n  file <file>           file type\n  stat <file>           details of a file\n  du                    file sizes\n  download <file>       download a scanned file (click link, notification, saved)\n  info                  summary, purpose, technology\n  explain               how this site works\n  pkg update|upgrade|list  check & install Bongkar Web updates\n  rm <file>             try to delete (read-only, just a mock)\n  history, !!           command history / repeat last command\n  lang id|en            change language\n  mode 1|2              change type (1 = gui, 2 = terminal)\n  clear (cl, cls)       clear the screen\n  echo, date, whoami, hostname, uname, exit\n<command> --help = explain that command.\nTab = autocomplete, up/down arrows = history, Ctrl+L = clear.",
   notFound:"{0}: command not found. type 'help'.",
   didYouMean:'did you mean: scan {0} ?',
   noData:'no data yet. run first: scan <url>',
@@ -330,7 +348,16 @@ en: {
   modeSet:'switching to type {0}', modeUsage:'usage: mode 1|2',
   exitMsg:'logout',
   backBtn:'← terminal (Esc)', alreadyTerm:'you are already in the terminal (type 2). type gui for type 1.',
-  roFs:'{0}: operation not permitted: read-only file system', useScan:'{0}: not available here. use: scan <url>'
+  roFs:'{0}: operation not permitted: read-only file system', useScan:'{0}: not available here. use: scan <url>',
+  dlUsage:'usage: download [-y] <file>', dlLink:'download {0} ({1}) — click here', dlAsk:'Download {0} ({1}) to your device?', dlBtn:'Download', cancel:'Cancel', dlDone:'✓ {0} downloaded',
+  helpNone:"no help for '{0}'. type 'help' for the list.", helpAlias:'alias:', helpEx:'example:',
+  pkgUsage:'usage: pkg update | upgrade [-y] | list', pkgReading:'Reading package lists ...',
+  pkgSrvOk:'Hit:1  fetch server (/api/fetch) ... OK', pkgSrvBad:'Err:1  fetch server (/api/fetch) ... unreachable',
+  pkgRepoOk:'Get:2  bongkar-web {0} ... OK', pkgRepoBad:'Err:2  cannot read the main page (offline, or opened from a local file?)',
+  pkgUpToDate:'All packages are up to date ({0}).', pkgNew:'{0} package(s) can be upgraded: {1} -> {2}. run: pkg upgrade',
+  pkgAsk:'Install bongkar-web {0}? (the page will reload)', pkgInstall:'Unpacking bongkar-web ({0}) ...', pkgReload:'Done. reloading ...',
+  pkgNone:'0 upgraded, 0 newly installed.', pkgListH:'Installed packages:', pkgM1:'scan & analysis engine', pkgM2:'terminal & virtual file system', pkgM3:'Indonesian & English language',
+  pkgNoPkg:"E: package '{0}' not found"
 }
 };
 let lang = 'id', mode = '2';
@@ -373,7 +400,7 @@ function log(msg, cls) {
   d.append(ts, m); box.appendChild(d); box.scrollTop = box.scrollHeight;
 }
 async function boot() {
-  log(t('bootOnline'), 'ok');
+  log(t('bootOnline', APP_VERSION), 'ok');
   await sleep(150); log(t('bootParser'), 'dim');
   await sleep(150); log(t('bootTracker'), 'dim');
   await sleep(150); log(t('bootWait'), 'wrn');
@@ -632,8 +659,9 @@ function openFile(url, kind, noTab) {
   } else {
     const s = store[url];
     const shown = s.text.length > 200000 ? s.text.slice(0, 200000) + '\n\n' + t('truncated') : s.text;
-    p.innerHTML = `<div class="viewhead"><b>$ cat ${esc(name)}</b><button class="see" id="cp">${esc(t('copy'))}</button></div><div class="mut" style="margin-bottom:8px">${esc(url)} · ${kb(s.size)}</div><pre></pre>`;
+    p.innerHTML = `<div class="viewhead"><b>$ cat ${esc(name)}</b><span style="display:flex;gap:6px"><button class="see" id="dlb">${esc(t('dlBtn'))}</button><button class="see" id="cp">${esc(t('copy'))}</button></span></div><div class="mut" style="margin-bottom:8px">${esc(url)} · ${kb(s.size)}</div><pre></pre>`;
     p.querySelector('pre').textContent = shown;
+    $('#dlb').onclick = () => { const en = S && S.vfs.find(x => x.url === url); if (en) askDownload(en); };
     $('#cp').onclick = async e => {
       try { await navigator.clipboard.writeText(s.text); e.target.textContent = t('copied'); } catch (x) { e.target.textContent = t('copyFail'); }
     };
@@ -737,8 +765,8 @@ const headTail = tail => async args => {
 };
 
 const CMDS = {
-  help: async () => tp(t('help')),
-  man: async () => tp(t('help')),
+  help: async a => helpCmd(a),
+  man: async a => helpCmd(a),
   clear: async () => { tout().innerHTML = ''; },
   echo: async (a, s) => tp(s.replace(/^\S+\s*/, '')),
   date: async () => tp(new Date().toLocaleString(lang === 'id' ? 'id-ID' : 'en-US')),
@@ -873,9 +901,143 @@ const CMDS = {
 CMDS.ll = a => CMDS.ls(['-l', ...a]);
 CMDS.dir = CMDS.ls;
 
+/* ---- notifikasi (toast) & unduh ---- */
+function toast(msg, actions, ms) {
+  const el = $('#toast'); el.innerHTML = '';
+  const hide = () => { el.hidden = true; };
+  const m = document.createElement('div'); m.className = 'tmsg'; m.textContent = msg; el.appendChild(m);
+  actions = actions || [];
+  if (actions.length) {
+    const row = document.createElement('div'); row.className = 'tact';
+    actions.forEach(([label, fn, pri]) => {
+      const b = document.createElement('button'); b.className = 'tb' + (pri ? ' pri' : ''); b.textContent = label;
+      b.onclick = () => { hide(); if (fn) fn(); }; row.appendChild(b);
+    });
+    el.appendChild(row);
+  }
+  el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(hide, ms || (actions.length ? 15000 : 3500));
+}
+const dlName = e => {
+  let n = (e.name || 'file').replace(/[^\w.\-@~]+/g, '_') || 'file';
+  if (!/\.[A-Za-z0-9]{1,6}$/.test(n)) n += ({ html: '.html', css: '.css', js: '.js', json: '.json' }[e.kind] || '.txt');
+  return n;
+};
+function doDownload(e) {
+  const s = store[e.url]; if (!s) return;
+  const ty = (s.type || '').split(';')[0] || ({ html: 'text/html', css: 'text/css', js: 'text/javascript', json: 'application/json' }[e.kind] || 'text/plain');
+  const blob = new Blob([s.text], { type: ty + ';charset=utf-8' });
+  const u = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = u; a.download = dlName(e); a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 4000);
+  toast(t('dlDone', dlName(e)));
+}
+function askDownload(e) {
+  if (!store[e.url]) return;
+  toast(t('dlAsk', dlName(e), kb(store[e.url].size)), [[t('dlBtn'), () => doDownload(e), true], [t('cancel'), null]]);
+}
+CMDS.download = async a => {
+  if (!need()) return;
+  const yes = a.some(x => x === '-y' || x === '--yes');
+  const f = a.find(x => !x.startsWith('-')); if (!f) return tp(t('dlUsage'), 'wrn');
+  const r = findEntry(f); if (!r) return tp(t('catNo', f), 'err');
+  if (r.dir) return tp(t('catDir', f), 'err');
+  const ft = fileText(r.e); if (ft.msg) return tp(ft.msg, ft.cls);
+  if (yes) return askDownload(r.e);
+  tph('<span class="ok">⬇</span> <a href="#" class="dl" data-p="' + esc(r.path) + '">' + esc(t('dlLink', r.e.name, kb(store[r.e.url].size))) + '</a>');
+};
+
+/* ---- bantuan per perintah ---- */
+const ALIAS = { cl: 'clear', cls: 'clear', reset: 'clear', ll: 'ls', la: 'ls', dir: 'ls', less: 'cat', more: 'cat', logout: 'exit', ui: 'gui', startx: 'gui', man: 'help' };
+const DOC = {
+  help: ['help [command]', 'Tampilkan daftar perintah, atau penjelasan detail satu perintah.', 'Show the command list, or the details of a single command.', 'help scan'],
+  scan: ['scan [-y|--yes] <url>', 'Memindai sebuah web: mengambil HTML, CSS, JS, dan manifest-nya lalu menganalisisnya. Tanpa -y akan tanya konfirmasi y/n dulu.', 'Scans a website: fetches its HTML, CSS, JS and manifest, then analyzes them. Without -y it asks y/n first.', 'scan -y contoh.vercel.app'],
+  gui: ['gui [url]', 'Masuk ke tipe 1 (halaman dengan kolom link dan tombol Scan). Kalau url diberikan, langsung dipindai. Tekan Esc untuk kembali ke terminal.', 'Enter type 1 (the page with the link box and Scan button). If a url is given it is scanned right away. Press Esc to return to the terminal.', 'gui contoh.vercel.app'],
+  ls: ['ls [-la] [folder]', 'Lihat isi folder hasil scan. -l = daftar panjang dengan ukuran. Warna menunjukkan jenis file.', 'List a scanned folder. -l = long list with sizes. Colours show the file type.', 'ls -l /js'],
+  cd: ['cd [folder | - | ~]', 'Pindah folder. .. naik satu tingkat, - kembali ke folder sebelumnya, ~ atau / ke root.', 'Change folder. .. goes up, - returns to the previous folder, ~ or / goes to the root.', 'cd ..'],
+  pwd: ['pwd', 'Tampilkan folder yang sedang dibuka.', 'Print the current folder.', 'pwd'],
+  tree: ['tree [folder]', 'Tampilkan semua file dan folder sebagai pohon.', 'Show all files and folders as a tree.', 'tree /js'],
+  cat: ['cat [-y] <file>', 'Tampilkan isi file. File lebih dari 200 baris akan tanya y/n dulu; -y melewatinya. Nama file saja cukup kalau unik.', 'Print a file. Files over 200 lines ask y/n first; -y skips that. A bare file name is enough if it is unique.', 'cat -y app.js'],
+  head: ['head [-n N] <file> [N]', 'Tampilkan N baris pertama sebuah file (default 10).', 'Show the first N lines of a file (default 10).', 'head index.html 20'],
+  tail: ['tail [-n N] <file> [N]', 'Tampilkan N baris terakhir sebuah file (default 10).', 'Show the last N lines of a file (default 10).', 'tail app.js 5'],
+  grep: ['grep [-i] <pattern> [file]', 'Cari teks (regex) di semua file hasil scan, atau di satu file. -i = tidak peduli huruf besar/kecil. Hasil memuat nama file dan nomor baris.', 'Search text (regex) in all scanned files, or in one file. -i = ignore case. Results show the file name and line number.', 'grep -i supabase'],
+  find: ['find [name]', 'Cari file yang jalurnya memuat kata tertentu.', 'Find files whose path contains a word.', 'find .css'],
+  wc: ['wc <file>', 'Hitung baris, kata, dan byte sebuah file.', 'Count the lines, words and bytes of a file.', 'wc index.html'],
+  file: ['file <file>', 'Tampilkan jenis dan status sebuah file.', 'Show the type and status of a file.', 'file app.js'],
+  stat: ['stat <file>', 'Detail file: jalur, jenis, ukuran, alamat asli, dan status.', 'File details: path, type, size, original address and status.', 'stat index.html'],
+  du: ['du', 'Tampilkan ukuran tiap file dan totalnya.', 'Show each file size and the total.', 'du'],
+  download: ['download [-y] <file>', 'Unduh file hasil scan ke perangkatmu. Muncul link yang bisa diklik; saat diklik muncul notifikasi untuk mengunduh, lalu file terunduh. Dengan -y notifikasi langsung muncul.', 'Download a scanned file to your device. A clickable link appears; clicking it shows a notification to download, then the file is saved. With -y the notification appears straight away.', 'download index.html'],
+  info: ['info', 'Ringkasan web yang dipindai: judul, alamat, perkiraan tujuan, teknologi, jumlah file.', 'Summary of the scanned site: title, address, guessed purpose, technology, file count.', 'info'],
+  explain: ['explain', 'Jelaskan langkah demi langkah cara kerja web yang dipindai.', 'Explain step by step how the scanned site works.', 'explain'],
+  pkg: ['pkg update | upgrade [-y] | list', 'update: cek versi terbaru Bongkar Web dan server fetch. upgrade: pasang versi terbaru dengan memuat ulang halaman (tanya y/n, -y = langsung). list: daftar modul terpasang.', 'update: check the latest Bongkar Web and the fetch server. upgrade: install the newest version by reloading the page (asks y/n, -y = immediately). list: installed modules.', 'pkg update'],
+  rm: ['rm <file>', 'Coba hapus file. Sistem file ini read-only, jadi hanya tiruan: ada konfirmasi y/n lalu ditolak.', 'Try to delete a file. This file system is read-only, so it is only a mock: it asks y/n, then refuses.', 'rm index.html'],
+  history: ['history', 'Tampilkan riwayat perintah. !! mengulang perintah terakhir.', 'Show the command history. !! repeats the last command.', 'history'],
+  lang: ['lang id|en', 'Ganti bahasa antarmuka antara Indonesia dan English.', 'Switch the interface language between Indonesian and English.', 'lang en'],
+  mode: ['mode 1|2', 'Ganti tipe tampilan: 1 = gui (tombol Scan), 2 = terminal.', 'Switch the view type: 1 = gui (Scan button), 2 = terminal.', 'mode 1'],
+  clear: ['clear', 'Bersihkan layar terminal. Ctrl+L juga bisa.', 'Clear the terminal screen. Ctrl+L works too.', 'clear'],
+  echo: ['echo [text]', 'Cetak teks yang kamu ketik.', 'Print the text you type.', 'echo halo'],
+  date: ['date', 'Tampilkan tanggal dan jam sekarang.', 'Show the current date and time.', 'date'],
+  whoami: ['whoami', 'Tampilkan nama pengguna.', 'Show the user name.', 'whoami'],
+  hostname: ['hostname', 'Tampilkan nama host target yang dipindai.', 'Show the host name of the scanned target.', 'hostname'],
+  uname: ['uname [-a]', 'Tampilkan info sistem.', 'Show system info.', 'uname -a'],
+  exit: ['exit', 'Keluar (logout) dan masuk lagi ke terminal bersih.', 'Log out and log back into a clean terminal.', 'exit']
+};
+function helpCmd(a) {
+  const q = (a[0] || '').toLowerCase();
+  if (!q) return tp(t('help'));
+  const key = ALIAS[q] || q, d = DOC[key];
+  if (!d) return tp(t('helpNone', a[0]), 'err');
+  const al = Object.keys(ALIAS).filter(k => ALIAS[k] === key);
+  tph('<span class="ok">' + esc(d[0]) + '</span>\n  ' + esc(lang === 'id' ? d[1] : d[2]) +
+    (al.length ? '\n  ' + esc(t('helpAlias')) + ' ' + esc(al.join(', ')) : '') + '\n  ' + esc(t('helpEx')) + ' ' + esc(d[3]));
+}
+
+/* ---- pkg: cek & pasang pembaruan Bongkar Web ---- */
+const cmpVer = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) { const d = (x[i] || 0) - (y[i] || 0); if (d) return d; } return 0; };
+async function pkgCheck() {
+  tp(t('pkgReading'), 'dim');
+  let srv = false, latest = null;
+  try { const r = await fetch('/api/fetch?url=x', { cache: 'no-store' }); await r.json(); srv = true; } catch (e) {}
+  tp(srv ? t('pkgSrvOk') : t('pkgSrvBad'), srv ? 'ok' : 'err');
+  try {
+    const r = await fetch(location.pathname + '?_=' + Date.now(), { cache: 'no-store' });
+    const m = (await r.text()).match(new RegExp('APP_VERSION = \\x27([0-9.]+)\\x27'));
+    if (m) latest = m[1];
+  } catch (e) {}
+  tp(latest ? t('pkgRepoOk', latest) : t('pkgRepoBad'), latest ? 'ok' : 'err');
+  return latest;
+}
+CMDS.pkg = async a => {
+  const sub = (a[0] || '').toLowerCase(), yes = a.some(x => x === '-y' || x === '--yes');
+  if (sub === 'update') {
+    TS.busy = true; let latest;
+    try { latest = await pkgCheck(); } finally { TS.busy = false; }
+    if (!latest) return;
+    if (cmpVer(latest, APP_VERSION) > 0) tp(t('pkgNew', 1, APP_VERSION, latest), 'wrn');
+    else tp(t('pkgUpToDate', APP_VERSION), 'ok');
+  } else if (sub === 'upgrade' || sub === 'full-upgrade') {
+    TS.busy = true; let latest;
+    try { latest = await pkgCheck(); } finally { TS.busy = false; }
+    if (!latest) return;
+    if (cmpVer(latest, APP_VERSION) <= 0) { tp(t('pkgUpToDate', APP_VERSION), 'ok'); tp(t('pkgNone'), 'dim'); return; }
+    tp(t('pkgNew', 1, APP_VERSION, latest), 'wrn');
+    const go = async () => {
+      tp(t('pkgInstall', latest), 'dim'); await sleep(500);
+      tp(t('pkgReload'), 'ok'); await sleep(600);
+      location.replace(location.pathname + '?v=' + encodeURIComponent(latest));
+    };
+    if (yes) await go(); else ask(t('pkgAsk', latest), go);
+  } else if (sub === 'list' || sub === 'list-installed') {
+    tp(t('pkgListH'), 'ok');
+    tp(['bongkar-core/' + APP_VERSION + '  ' + t('pkgM1'), 'vfs-shell/' + APP_VERSION + '  ' + t('pkgM2'), 'i18n-id-en/' + APP_VERSION + '  ' + t('pkgM3')].join('\n'));
+  } else if (sub === 'install' || sub === 'remove' || sub === 'uninstall') {
+    tp(t('pkgNoPkg', a[1] || ''), 'err');
+  } else tp(t('pkgUsage'), 'wrn');
+};
+
 /* ---- alias & perintah tambahan ---- */
 function welcome() {
-  tp('BONGKAR_WEB terminal v1.0', 'ok'); tp(t('tWelcome'), 'dim');
+  tp('BONGKAR_WEB terminal v' + APP_VERSION, 'ok'); tp(t('tWelcome'), 'dim');
   if (S) tp(t('tHaveData', new URL(S.base).host), 'wrn');
 }
 const _cat = CMDS.cat;
@@ -925,7 +1087,7 @@ CMDS.du = async () => {
   tph(rows.map(e => kb(e.size).padStart(9) + '  <span class="k-' + e.kind + '">' + esc(e.path) + '</span>').join('\n') + '\n' + kb(tot).padStart(9) + '  total');
 };
 CMDS.hostname = async () => tp(S ? new URL(S.base).host : 'bongkar');
-CMDS.uname = async a => tp(a.includes('-a') ? 'BongkarOS 1.0 ' + (S ? new URL(S.base).host : 'bongkar') + ' web x86_64 GNU/Browser' : 'BongkarOS');
+CMDS.uname = async a => tp(a.includes('-a') ? 'BongkarOS ' + APP_VERSION + ' ' + (S ? new URL(S.base).host : 'bongkar') + ' web x86_64 GNU/Browser' : 'BongkarOS');
 ['touch', 'mkdir', 'mv', 'cp', 'chmod', 'chown', 'ln', 'tee'].forEach(c => { CMDS[c] = async () => tp(t('roFs', c), 'err'); });
 ['curl', 'wget', 'open'].forEach(c => { CMDS[c] = async () => tp(t('useScan', c), 'wrn'); });
 
@@ -953,7 +1115,7 @@ async function exec(line) {
   TS.hist.push(s); TS.hi = TS.hist.length;
   const parts = s.split(/\s+/), cmd = parts[0].toLowerCase(), args = parts.slice(1);
   const fn = CMDS[cmd];
-  if (fn && args.includes('--help')) { tp(USAGE[cmd] || ('usage: ' + cmd), 'dim'); return; }
+  if (fn && args.includes('--help')) { await CMDS.help([cmd]); return; }
   if (!fn) {
     tp(t('notFound', parts[0]), 'err');
     if (/^https?:\/\//i.test(parts[0])) tp(t('didYouMean', parts[0]), 'dim');
@@ -995,13 +1157,19 @@ function complete() {
 
 $('#tin').addEventListener('keydown', e => {
   const tin = e.target;
-  if (e.key === 'ArrowUp') { e.preventDefault(); if (TS.hi > 0) { TS.hi--; tin.value = TS.hist[TS.hi]; } }
+  if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); const v = tin.value; tin.value = ''; submitLine(v); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); if (TS.hi > 0) { TS.hi--; tin.value = TS.hist[TS.hi]; } }
   else if (e.key === 'ArrowDown') { e.preventDefault(); if (TS.hi < TS.hist.length - 1) { TS.hi++; tin.value = TS.hist[TS.hi]; } else { TS.hi = TS.hist.length; tin.value = ''; } }
   else if (e.key === 'Tab') { e.preventDefault(); complete(); }
   else if (e.ctrlKey && e.key.toLowerCase() === 'l') { e.preventDefault(); tout().innerHTML = ''; }
   else if (e.ctrlKey && e.key.toLowerCase() === 'c' && tin.selectionStart === tin.selectionEnd) {
     e.preventDefault(); tph('<span class="pp">' + esc(promptText()) + '</span> ' + esc(tin.value) + '^C'); tin.value = ''; TS.pending = null; updatePrompt();
   }
+});
+$('#tout').addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('.dl'); if (!a) return;
+  e.preventDefault(); e.stopPropagation();
+  const en = S && S.vfs.find(x => x.path === a.dataset.p); if (en) askDownload(en);
 });
 $('#term').addEventListener('click', () => { if (!String(getSelection())) $('#tin').focus(); });
 document.querySelectorAll('#chips .chip').forEach(b => {
@@ -1024,7 +1192,7 @@ function setMode(m) {
   if (m === '2') {
     if (!TS.welcomed) {
       TS.welcomed = true;
-      tp('BONGKAR_WEB terminal v1.0', 'ok'); tp(t('tWelcome'), 'dim');
+      tp('BONGKAR_WEB terminal v' + APP_VERSION, 'ok'); tp(t('tWelcome'), 'dim');
       if (S) tp(t('tHaveData', new URL(S.base).host), 'wrn');
     }
     updatePrompt(); setTimeout(() => $('#tin').focus(), 0);
