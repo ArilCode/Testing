@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bongkar Web</title>
+<style>
+:root{--bg:#eef2f1;--card:#fff;--ink:#17302e;--mut:#5b716e;--line:#d3dedb;--acc:#0f766e;--accink:#fff;--hl:#f5c84b;--bad:#b4412f;
+--css:#3b6fd1;--js:#c99a06;--img:#7a4fc4;--json:#0f766e;--html:#b4412f;--page:#5b716e}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1b1a;--card:#162726;--ink:#e4efed;--mut:#93aba7;--line:#284240;--acc:#4fd1c0;--accink:#07211d;--bad:#f08a78;
+--css:#7ea6f0;--js:#e6bd3c;--img:#b394f0;--json:#4fd1c0;--html:#f08a78;--page:#93aba7}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:2rem;line-height:1.1;margin:8px 0 6px;letter-spacing:-.02em}
+h1 mark{background:var(--hl);color:#17302e;padding:0 .2em;border-radius:3px}
+.lead{color:var(--mut);margin:0 0 18px;max-width:46ch}
+.bar{display:flex;gap:8px}
+input{flex:1;min-width:0;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+input:focus,button:focus-visible{outline:3px solid var(--hl);outline-offset:1px;border-color:var(--acc)}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px}
+.go{background:var(--acc);color:var(--accink);padding:12px 18px;font-weight:700}
+.go:disabled{opacity:.6}
+#status{margin:14px 0 0;color:var(--mut);min-height:1.5em}
+#status.err{color:var(--bad);font-weight:600}
+#out[hidden]{display:none}
+.tabs{display:flex;gap:4px;margin:22px 0 14px;border-bottom:2px solid var(--line);overflow-x:auto}
+.tab{background:none;color:var(--mut);padding:10px 14px;font-weight:600;white-space:nowrap;border-radius:8px 8px 0 0;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--acc)}
+.panel[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 12px}
+.card h2{font-size:1.05rem;margin:0 0 6px}
+.card p{margin:.3em 0}
+.mut{color:var(--mut);font-size:.92rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:1.5rem;line-height:1.1}
+.stat span{color:var(--mut);font-size:.85rem}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.88rem}
+.folder{font-weight:700;margin:16px 0 6px;word-break:break-all}
+.row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--page);border-radius:10px;padding:9px 10px;margin:0 0 6px}
+.row[data-k=html]{border-left-color:var(--html)}.row[data-k=css]{border-left-color:var(--css)}
+.row[data-k=js]{border-left-color:var(--js)}.row[data-k=img]{border-left-color:var(--img)}.row[data-k=json]{border-left-color:var(--json)}
+.row .nm{flex:1;min-width:0;word-break:break-all;font-size:.95rem}
+.row .nm small{display:block;color:var(--mut)}
+.see{background:var(--bg);color:var(--ink);border:1px solid var(--line);padding:6px 12px;font-size:.9rem;font-weight:600}
+ol.steps{padding-left:1.2em;margin:0}
+ol.steps li{margin:0 0 10px}
+.viewhead{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:8px}
+.viewhead b{word-break:break-all;font-size:.95rem}
+pre{margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;overflow:auto;max-height:70vh;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre;tab-size:2}
+.preview{max-width:100%;max-height:50vh;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.note{border-left:4px solid var(--hl);padding:6px 12px;margin:12px 0;color:var(--mut);font-size:.92rem}
+@media(prefers-reduced-motion:no-preference){.tab{transition:color .15s}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Bongkar <mark>Web</mark></h1>
+  <p class="lead">Tempel link sebuah web. Kamu akan lihat file apa saja di dalamnya, isi kodenya, cara kerjanya, dan untuk apa web itu dibuat.</p>
+
+  <div class="bar">
+    <input id="u" type="url" inputmode="url" autocomplete="off" autocapitalize="off" placeholder="https://contoh.vercel.app" aria-label="Link web">
+    <button class="go" id="go">Periksa</button>
+  </div>
+  <p id="status" role="status"></p>
+
+  <div id="out" hidden>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-t="ring" aria-selected="true">Ringkasan</button>
+      <button class="tab" role="tab" data-t="file" aria-selected="false">File</button>
+      <button class="tab" role="tab" data-t="cara" aria-selected="false">Cara kerja</button>
+      <button class="tab" role="tab" data-t="kode" aria-selected="false">Isi file</button>
+    </div>
+    <section class="panel" id="p-ring"></section>
+    <section class="panel" id="p-file" hidden></section>
+    <section class="panel" id="p-cara" hidden></section>
+    <section class="panel" id="p-kode" hidden><p class="mut">Pilih sebuah file di tab File, lalu tekan Lihat isi.</p></section>
+  </div>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const kb = n => n == null ? '?' : n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(1) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
+const LABEL = {html:'HTML', css:'CSS', js:'JavaScript', img:'Gambar', json:'Data/manifest', page:'Halaman lain'};
+const store = {};
+
+function status(msg, err) { const s = $('#status'); s.textContent = msg; s.className = err ? 'err' : ''; }
+
+async function getRemote(url) {
+  try {
+    const r = await fetch('/api/fetch?url=' + encodeURIComponent(url));
+    return await r.json();
+  } catch (e) {
+    return { error: 'Tidak bisa menghubungi server. Pastikan folder api/fetch.js ikut ter-upload.' };
+  }
+}
+
+function showTab(t) {
+  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.t === t));
+  document.querySelectorAll('.panel').forEach(p => p.hidden = p.id !== 'p-' + t);
+}
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => showTab(b.dataset.t));
+$('#u').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+$('#go').onclick = run;
+
+async function run() {
+  let raw = $('#u').value.trim();
+  if (!raw) return status('Isi dulu link webnya.', true);
+  if (!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
+  $('#go').disabled = true;
+  $('#out').hidden = true;
+  status('Mengambil halaman utama…');
+  try {
+    const main = await getRemote(raw);
+    if (main.error) throw new Error(main.error);
+    if (!main.text) throw new Error('Link ini bukan halaman teks (tipe: ' + (main.type || 'tidak diketahui') + ').');
+    if (!main.ok) status('Server membalas status ' + main.status + ', tetap dianalisis.');
+
+    const base = main.finalUrl;
+    store[base] = { text: main.text, type: main.type, size: main.size };
+    const doc = new DOMParser().parseFromString(main.text, 'text/html');
+    const items = collect(doc, base);
+
+    const fetchable = items.filter(i => ['css', 'js', 'json'].includes(i.kind)).slice(0, 15);
+    for (let i = 0; i < fetchable.length; i += 5) {
+      status('Membaca file pendukung ' + Math.min(i + 5, fetchable.length) + ' dari ' + fetchable.length + '…');
+      await Promise.all(fetchable.slice(i, i + 5).map(async it => {
+        const r = await getRemote(it.url);
+        if (r.text != null) store[it.url] = { text: r.text, type: r.type, size: r.size };
+        it.size = r.size; it.ok = r.ok; it.err = r.error;
+      }));
+    }
+    render(doc, base, main, items);
+    status('Selesai. Periksa tab di bawah.');
+    $('#out').hidden = false;
+    showTab('ring');
+  } catch (e) {
+    status(e.message, true);
+  }
+  $('#go').disabled = false;
+}
+
+function collect(doc, base) {
+  const map = new Map();
+  const add = (src, kind) => {
+    if (!src || /^(data:|javascript:|mailto:|tel:|#|blob:)/i.test(src)) return;
+    try { const u = new URL(src, base); u.hash = ''; if (!map.has(u.href)) map.set(u.href, { url: u.href, kind }); } catch (e) {}
+  };
+  doc.querySelectorAll('link[rel~=stylesheet]').forEach(e => add(e.getAttribute('href'), 'css'));
+  doc.querySelectorAll('script[src]').forEach(e => add(e.getAttribute('src'), 'js'));
+  doc.querySelectorAll('img[src],source[src],link[rel~=icon],link[rel=apple-touch-icon]').forEach(e => add(e.getAttribute('src') || e.getAttribute('href'), 'img'));
+  doc.querySelectorAll('link[rel=manifest]').forEach(e => add(e.getAttribute('href'), 'json'));
+  const origin = new URL(base).origin;
+  let pages = 0;
+  doc.querySelectorAll('a[href],iframe[src]').forEach(e => {
+    if (pages >= 30) return;
+    try {
+      const u = new URL(e.getAttribute('href') || e.getAttribute('src'), base);
+      if (u.origin === origin && u.pathname !== new URL(base).pathname && /^https?:$/.test(u.protocol)) { add(u.href, 'page'); pages++; }
+    } catch (e) {}
+  });
+  const list = [...map.values()];
+  list.forEach(i => i.same = new URL(i.url).origin === origin);
+  return list;
+}
+
+function guessPurpose(doc, items, code) {
+  const txt = [doc.title, (doc.querySelector('meta[name=description]') || {}).content || '',
+    [...doc.querySelectorAll('h1,h2,h3')].map(h => h.textContent).join(' '),
+    (doc.body ? doc.body.textContent : '').replace(/\s+/g, ' ').slice(0, 800),
+    items.map(i => i.url).join(' ')].join(' ').toLowerCase();
+  const rules = [
+    [/absen|presensi|kehadiran/, 'mencatat kehadiran (absensi/presensi)'],
+    [/game|permainan|skor|score|level/, 'permainan atau hiburan'],
+    [/convert|konversi|ubah format/, 'mengubah satu format file/data ke format lain'],
+    [/login|masuk|daftar|register|password|sandi/, 'tempat pengguna masuk atau membuat akun'],
+    [/toko|produk|keranjang|harga|cart|checkout/, 'toko atau katalog produk'],
+    [/blog|artikel|berita|post/, 'membaca artikel atau berita'],
+    [/kelas|siswa|sekolah|guru|pr\b|tugas|nilai/, 'keperluan sekolah atau kelas'],
+    [/kalkulator|hitung|calculator/, 'alat hitung'],
+    [/galeri|foto|gallery|portfolio|portofolio/, 'menampilkan galeri atau portofolio'],
+    [/dashboard|monitor|statistik|grafik|chart/, 'memantau data lewat dashboard'],
+    [/kontak|tentang kami|about us|profil/, 'halaman profil atau perkenalan']
+  ];
+  const hit = rules.filter(r => r[0].test(txt)).map(r => r[1]);
+  return hit.slice(0, 3);
+}
+
+function render(doc, base, main, items) {
+  const origin = new URL(base).origin;
+  const jsTexts = items.filter(i => i.kind === 'js' && store[i.url]).map(i => store[i.url].text);
+  const inlineJs = [...doc.querySelectorAll('script:not([src])')].map(s => s.textContent);
+  const allJs = jsTexts.concat(inlineJs).join('\n');
+  const everything = main.text + '\n' + allJs + items.filter(i => i.kind === 'css' && store[i.url]).map(i => store[i.url].text).join('\n');
+  const urlsAll = items.map(i => i.url).join(' ');
+
+  const f = {
+    api: /\bfetch\s*\(|XMLHttpRequest|axios/.test(allJs),
+    supabase: /supabase/i.test(allJs + urlsAll),
+    firebase: /firebase/i.test(allJs + urlsAll),
+    store: /localStorage|sessionStorage|indexedDB/.test(allJs),
+    sw: /serviceWorker/.test(allJs),
+    ws: /WebSocket/.test(allJs),
+    forms: doc.querySelectorAll('form').length,
+    inputs: doc.querySelectorAll('input,textarea,select').length,
+    buttons: doc.querySelectorAll('button').length,
+    manifest: !!doc.querySelector('link[rel=manifest]'),
+    viewport: !!doc.querySelector('meta[name=viewport]')
+  };
+  const tech = [];
+  if (/react/i.test(urlsAll) || /React\.createElement|__REACT/.test(allJs)) tech.push('React');
+  if (/vue/i.test(urlsAll) || /__VUE__|new Vue\(/.test(allJs)) tech.push('Vue');
+  if (/_next\//.test(everything)) tech.push('Next.js');
+  if (/jquery/i.test(urlsAll) || /jQuery/.test(allJs)) tech.push('jQuery');
+  if (/bootstrap/i.test(urlsAll + everything.slice(0, 20000))) tech.push('Bootstrap');
+  if (/tailwind/i.test(urlsAll + main.text)) tech.push('Tailwind');
+  if (f.supabase) tech.push('Supabase');
+  if (f.firebase) tech.push('Firebase');
+  if (f.manifest || f.sw) tech.push('PWA');
+  if (/\.vercel\.app$/.test(new URL(base).hostname)) tech.push('Vercel');
+  if (/\.github\.io$/.test(new URL(base).hostname)) tech.push('GitHub Pages');
+
+  const apis = [...new Set((allJs.match(/https?:\/\/[^\s"'`<>)\\]+/g) || []).map(s => s.replace(/[.,;]+$/, '')))]
+    .filter(s => !/w3\.org|schema\.org|reactjs\.org|github\.com\/facebook|mozilla\.org/.test(s)).slice(0, 8);
+
+  const purpose = guessPurpose(doc, items, allJs);
+  const desc = (doc.querySelector('meta[name=description]') || {}).content || '';
+  const total = [main.size].concat(items.map(i => i.size)).reduce((a, b) => a + (b || 0), 0);
+  const nFiles = items.filter(i => i.kind !== 'page').length + 1;
+
+  // Ringkasan
+  $('#p-ring').innerHTML = `
+    <div class="card"><h2>${esc(doc.title || 'Tanpa judul')}</h2>
+      <p class="mut" style="word-break:break-all">${esc(base)}</p>
+      ${desc ? `<p>${esc(desc)}</p>` : ''}</div>
+    <div class="stats">
+      <div class="stat"><b>${nFiles}</b><span>file dipakai</span></div>
+      <div class="stat"><b>${kb(total)}</b><span>ukuran terbaca</span></div>
+      <div class="stat"><b>${inlineJs.length}</b><span>kode JS di dalam HTML</span></div>
+    </div>
+    <div class="card"><h2>Tujuan web ini</h2>
+      ${purpose.length ? `<p>Dari judul, tulisan, dan nama filenya, web ini kemungkinan untuk: <b>${esc(purpose.join('; '))}</b>.</p>` : `<p>Belum bisa dipastikan dari isinya. Baca judul dan tulisan di halamannya untuk memastikan.</p>`}
+      <p class="mut">Ini perkiraan otomatis dari kata-kata yang muncul, bukan kepastian.</p></div>
+    <div class="card"><h2>Teknologi yang terdeteksi</h2>
+      ${tech.length ? `<div class="tags">${tech.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : '<p class="mut">Hanya HTML, CSS, dan JavaScript biasa.</p>'}
+      ${apis.length ? `<p class="mut" style="margin-top:12px">Alamat luar yang disebut di kode JS:</p><div class="tags">${apis.map(a => `<span class="tag" style="word-break:break-all;border-radius:8px">${esc(a)}</span>`).join('')}</div>` : ''}</div>
+    <p class="note">Yang terlihat hanya kode yang dikirim ke browser. Kode server atau isi database tidak bisa dilihat dari luar.</p>`;
+
+  // File
+  const groups = {};
+  const everyFile = [{ url: base, kind: 'html', same: true, size: main.size, main: true }].concat(items);
+  everyFile.forEach(i => {
+    const u = new URL(i.url);
+    let dir, name;
+    if (u.origin !== origin) { dir = u.host; name = u.pathname.split('/').pop() || u.pathname; }
+    else {
+      const parts = u.pathname.split('/').filter(Boolean);
+      name = parts.pop() || (i.main ? 'index.html' : '/');
+      dir = parts.length ? '/' + parts.join('/') + '/' : '/ (folder utama)';
+    }
+    (groups[dir] = groups[dir] || []).push({ ...i, name });
+  });
+  const order = Object.keys(groups).sort((a, b) => (a[0] === '/' ? 0 : 1) - (b[0] === '/' ? 0 : 1) || a.localeCompare(b));
+  let html = `<p class="mut">Warna di kiri menunjukkan jenis file. Folder di luar web ini (CDN, font, dll.) ada di bagian bawah.</p>`;
+  order.forEach(dir => {
+    html += `<div class="folder">${esc(dir)}</div>`;
+    groups[dir].forEach(i => {
+      const canSee = !!store[i.url] || i.kind === 'img';
+      html += `<div class="row" data-k="${i.kind}"><div class="nm">${esc(i.name)}<small>${LABEL[i.kind]}${i.size != null ? ' · ' + kb(i.size) : ''}${i.err ? ' · gagal dibaca' : ''}</small></div>
+        ${canSee ? `<button class="see" data-u="${esc(i.url)}" data-k="${i.kind}">Lihat isi</button>` : ''}</div>`;
+    });
+  });
+  $('#p-file').innerHTML = html;
+  $('#p-file').querySelectorAll('.see').forEach(b => b.onclick = () => openFile(b.dataset.u, b.dataset.k));
+
+  // Cara kerja
+  const css = items.filter(i => i.kind === 'css').length, js = items.filter(i => i.kind === 'js').length;
+  const steps = [
+    `Kamu membuka <b>${esc(new URL(base).host)}</b>. Browser meminta file HTML utama ke server, lalu server mengirimnya.`,
+    `Browser membaca HTML dari atas ke bawah. HTML berisi kerangka halaman: judul, teks, tombol${f.forms ? ', dan ' + f.forms + ' form' : ''}${f.inputs ? ' (' + f.inputs + ' kolom isian)' : ''}.`,
+    css ? `Di dalam HTML ada ${css} file CSS yang diminta browser. CSS mengatur warna, ukuran, dan tata letak supaya tampilannya rapi${f.viewport ? ', termasuk agar pas di layar HP' : ''}.` : 'Tidak ada file CSS terpisah; gayanya ditulis langsung di HTML atau memakai bawaan browser.',
+    js || inlineJs.length ? `JavaScript (${js} file${inlineJs.length ? ' + ' + inlineJs.length + ' kode di dalam HTML' : ''}) berjalan di browser kamu dan membuat halaman bisa bereaksi saat disentuh.` : 'Tidak ada JavaScript, jadi halaman ini hanya menampilkan isi tanpa logika.'
+  ];
+  if (f.api) steps.push('Kode JS memanggil <code>fetch</code> untuk meminta atau mengirim data ke alamat lain di internet.');
+  if (f.supabase) steps.push('Data disimpan dan dibaca dari <b>Supabase</b> (database online), jadi isinya bisa dipakai bersama oleh banyak pengguna.');
+  if (f.firebase) steps.push('Data disimpan atau dibaca dari <b>Firebase</b> (layanan online dari Google).');
+  if (f.store) steps.push('Sebagian data disimpan di browser kamu sendiri (localStorage/IndexedDB), jadi tetap ada saat dibuka lagi di HP yang sama.');
+  if (f.sw) steps.push('Ada <b>service worker</b>: web ini menyimpan filenya di HP sehingga bisa dibuka tanpa internet (PWA).');
+  if (f.ws) steps.push('Memakai WebSocket untuk menerima data langsung tanpa memuat ulang halaman.');
+  steps.push('Hasil akhirnya: browser menggabungkan HTML, CSS, dan JS menjadi halaman yang kamu lihat dan pakai.');
+  $('#p-cara').innerHTML = `<div class="card"><ol class="steps">${steps.map(s => `<li>${s}</li>`).join('')}</ol></div>` +
+    (nFiles <= 2 && !allJs.trim() ? `<p class="note">Halaman ini hampir kosong dari sisi browser. Kalau webnya dibuat dengan React/Next, isinya baru dibuat oleh JavaScript, jadi analisis ini mungkin kurang lengkap.</p>` : '');
+}
+
+function openFile(url, kind) {
+  const p = $('#p-kode');
+  const name = new URL(url).pathname.split('/').pop() || 'index.html';
+  if (kind === 'img' && !store[url]) {
+    p.innerHTML = `<div class="viewhead"><b>${esc(name)}</b></div><img class="preview" src="${esc(url)}" alt="${esc(name)}">`;
+  } else {
+    const s = store[url];
+    const shown = s.text.length > 200000 ? s.text.slice(0, 200000) + '\n\n… (dipotong, file terlalu panjang)' : s.text;
+    p.innerHTML = `<div class="viewhead"><b>${esc(name)}</b><button class="see" id="cp">Salin</button></div><div class="mut" style="margin-bottom:8px">${esc(url)} · ${kb(s.size)}</div><pre></pre>`;
+    p.querySelector('pre').textContent = shown;
+    $('#cp').onclick = async e => {
+      try { await navigator.clipboard.writeText(s.text); e.target.textContent = 'Tersalin'; } catch (x) { e.target.textContent = 'Gagal salin'; }
+    };
+  }
+  showTab('kode');
+  window.scrollTo({ top: 0 });
+}
+</script>
+</body>
+</html>
