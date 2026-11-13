@@ -5,67 +5,101 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bongkar Web</title>
 <style>
-:root{--bg:#eef2f1;--card:#fff;--ink:#17302e;--mut:#5b716e;--line:#d3dedb;--acc:#0f766e;--accink:#fff;--hl:#f5c84b;--bad:#b4412f;
---css:#3b6fd1;--js:#c99a06;--img:#7a4fc4;--json:#0f766e;--html:#b4412f;--page:#5b716e}
-@media(prefers-color-scheme:dark){:root{--bg:#0f1b1a;--card:#162726;--ink:#e4efed;--mut:#93aba7;--line:#284240;--acc:#4fd1c0;--accink:#07211d;--bad:#f08a78;
---css:#7ea6f0;--js:#e6bd3c;--img:#b394f0;--json:#4fd1c0;--html:#f08a78;--page:#93aba7}}
+:root{--bg:#030806;--card:#07130e;--ink:#b6f5c8;--mut:#5f9a74;--line:#14452c;--acc:#00ff7f;--accink:#00170a;--hl:#00ff7f;--bad:#ff4d5e;--warn:#ffd23f;
+--css:#4da3ff;--js:#ffd23f;--img:#c58bff;--json:#00ff7f;--html:#ff4d5e;--page:#5f9a74;
+--mono:ui-monospace,"Cascadia Code","Fira Code",Menlo,Consolas,monospace}
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:720px;margin:0 auto;padding:20px 16px 48px}
-h1{font-size:2rem;line-height:1.1;margin:8px 0 6px;letter-spacing:-.02em}
-h1 mark{background:var(--hl);color:#17302e;padding:0 .2em;border-radius:3px}
-.lead{color:var(--mut);margin:0 0 18px;max-width:46ch}
-.bar{display:flex;gap:8px}
-input{flex:1;min-width:0;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
-input:focus,button:focus-visible{outline:3px solid var(--hl);outline-offset:1px;border-color:var(--acc)}
-button{font:inherit;cursor:pointer;border:0;border-radius:10px}
-.go{background:var(--acc);color:var(--accink);padding:12px 18px;font-weight:700}
-.go:disabled{opacity:.6}
-#status{margin:14px 0 0;color:var(--mut);min-height:1.5em}
-#status.err{color:var(--bad);font-weight:600}
+html{-webkit-text-size-adjust:100%;color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--mono);min-height:100vh;position:relative}
+/* matrix rain di belakang */
+#rain{position:fixed;inset:0;width:100%;height:100%;z-index:0;opacity:.18;pointer-events:none}
+/* garis scan CRT */
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:5;
+background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+main{position:relative;z-index:2;max-width:720px;margin:0 auto;padding:20px 16px 56px}
+.ascii{margin:6px 0 0;color:var(--acc);font-size:.62rem;line-height:1.15;text-shadow:0 0 6px var(--acc);overflow:hidden;white-space:pre}
+h1{font-size:1.7rem;line-height:1.1;margin:10px 0 6px;letter-spacing:.02em;color:var(--acc);text-shadow:0 0 10px rgba(0,255,127,.7)}
+h1 .cur,.cursor{display:inline-block;width:.6em;height:1.05em;background:var(--acc);vertical-align:-.15em;margin-left:4px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.lead{color:var(--mut);margin:0 0 18px;max-width:52ch}
+.lead::before{content:"# ";color:var(--acc)}
+.bar{display:flex;gap:8px;align-items:stretch}
+.prompt{display:flex;flex:1;min-width:0;align-items:center;border:1px solid var(--acc);background:#020a06;box-shadow:0 0 12px rgba(0,255,127,.25),inset 0 0 8px rgba(0,255,127,.08)}
+.prompt span{padding-left:10px;color:var(--acc);white-space:nowrap;font-weight:700}
+input{flex:1;min-width:0;font:inherit;padding:12px 10px;border:0;background:transparent;color:var(--ink);caret-color:var(--acc);outline:0}
+input::placeholder{color:#2f6a47}
+.prompt:focus-within{box-shadow:0 0 18px rgba(0,255,127,.55),inset 0 0 8px rgba(0,255,127,.12)}
+button{font:inherit;cursor:pointer;border:0;border-radius:0}
+button:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.go{background:var(--acc);color:var(--accink);padding:12px 16px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 0 14px rgba(0,255,127,.5)}
+.go:hover{filter:brightness(1.15)}
+.go:disabled{opacity:.5;cursor:progress}
+/* terminal log */
+#log{margin:14px 0 0;border:1px solid var(--line);background:#020a06;padding:10px 12px;height:210px;overflow:auto;font-size:.82rem;line-height:1.5;box-shadow:inset 0 0 14px rgba(0,255,127,.06)}
+#log .l{white-space:pre-wrap;word-break:break-all}
+#log .t{color:#2f6a47}
+#log .inf{color:var(--ink)}
+#log .ok{color:var(--acc)}
+#log .wrn{color:var(--warn)}
+#log .err{color:var(--bad);font-weight:700}
+#log .dim{color:var(--mut)}
 #out[hidden]{display:none}
-.tabs{display:flex;gap:4px;margin:22px 0 14px;border-bottom:2px solid var(--line);overflow-x:auto}
-.tab{background:none;color:var(--mut);padding:10px 14px;font-weight:600;white-space:nowrap;border-radius:8px 8px 0 0;border-bottom:3px solid transparent;margin-bottom:-2px}
-.tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--acc)}
+.tabs{display:flex;gap:4px;margin:22px 0 14px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{background:none;color:var(--mut);padding:10px 14px;font-weight:700;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab::before{content:"./";opacity:.6}
+.tab[aria-selected=true]{color:var(--acc);border-bottom-color:var(--acc);text-shadow:0 0 8px rgba(0,255,127,.6)}
 .panel[hidden]{display:none}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 12px}
-.card h2{font-size:1.05rem;margin:0 0 6px}
+.card{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--acc);padding:14px 16px;margin:0 0 12px}
+.card h2{font-size:1rem;margin:0 0 6px;color:var(--acc);text-transform:uppercase;letter-spacing:.05em}
+.card h2::before{content:"> ";opacity:.7}
 .card p{margin:.3em 0}
-.mut{color:var(--mut);font-size:.92rem}
+.card b{color:#fff}
+code{color:var(--warn)}
+.mut{color:var(--mut);font-size:.88rem}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
-.stat b{display:block;font-size:1.5rem;line-height:1.1}
-.stat span{color:var(--mut);font-size:.85rem}
+.stat{background:var(--card);border:1px solid var(--line);padding:10px 12px}
+.stat b{display:block;font-size:1.4rem;line-height:1.1;color:var(--acc);text-shadow:0 0 8px rgba(0,255,127,.6)}
+.stat span{color:var(--mut);font-size:.78rem}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.tag{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.88rem}
-.folder{font-weight:700;margin:16px 0 6px;word-break:break-all}
-.row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--page);border-radius:10px;padding:9px 10px;margin:0 0 6px}
+.tag{background:#020a06;border:1px solid var(--acc);color:var(--acc);padding:2px 10px;font-size:.84rem}
+.folder{font-weight:700;margin:16px 0 6px;word-break:break-all;color:var(--acc)}
+.folder::before{content:"$ ls ";color:var(--mut);font-weight:400}
+.row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--page);padding:9px 10px;margin:0 0 6px}
 .row[data-k=html]{border-left-color:var(--html)}.row[data-k=css]{border-left-color:var(--css)}
 .row[data-k=js]{border-left-color:var(--js)}.row[data-k=img]{border-left-color:var(--img)}.row[data-k=json]{border-left-color:var(--json)}
-.row .nm{flex:1;min-width:0;word-break:break-all;font-size:.95rem}
+.row .nm{flex:1;min-width:0;word-break:break-all;font-size:.92rem}
 .row .nm small{display:block;color:var(--mut)}
-.see{background:var(--bg);color:var(--ink);border:1px solid var(--line);padding:6px 12px;font-size:.9rem;font-weight:600}
-ol.steps{padding-left:1.2em;margin:0}
+.see{background:transparent;color:var(--acc);border:1px solid var(--acc);padding:6px 12px;font-size:.85rem;font-weight:700}
+.see:hover{background:var(--acc);color:var(--accink)}
+ol.steps{padding-left:1.4em;margin:0}
 ol.steps li{margin:0 0 10px}
+ol.steps li::marker{color:var(--acc)}
 .viewhead{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:8px}
-.viewhead b{word-break:break-all;font-size:.95rem}
-pre{margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;overflow:auto;max-height:70vh;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre;tab-size:2}
-.preview{max-width:100%;max-height:50vh;border:1px solid var(--line);border-radius:10px;background:var(--card)}
-.note{border-left:4px solid var(--hl);padding:6px 12px;margin:12px 0;color:var(--mut);font-size:.92rem}
-@media(prefers-reduced-motion:no-preference){.tab{transition:color .15s}}
+.viewhead b{word-break:break-all;font-size:.92rem;color:var(--acc)}
+pre{margin:0;background:#020a06;border:1px solid var(--line);padding:12px;overflow:auto;max-height:70vh;font:12.5px/1.5 var(--mono);color:#9af0b4;white-space:pre;tab-size:2}
+.preview{max-width:100%;max-height:50vh;border:1px solid var(--line);background:var(--card)}
+.note{border-left:3px solid var(--warn);padding:6px 12px;margin:12px 0;color:var(--mut);font-size:.88rem}
+.note::before{content:"[!] ";color:var(--warn)}
+@media(prefers-reduced-motion:reduce){h1 .cur,.cursor{animation:none}#rain{display:none}}
 </style>
 </head>
 <body>
+<canvas id="rain" aria-hidden="true"></canvas>
 <main>
-  <h1>Bongkar <mark>Web</mark></h1>
+  <pre class="ascii" aria-hidden="true">  ___  ___  _  _  ___ _  __ _   ___
+ | _ )/ _ \| \| |/ __| |/ // \ | _ \
+ | _ \ (_) | .` | (_ | ' &lt;/ _ \|   /
+ |___/\___/|_|\_|\___|_|\_\_/ \_\_|_\</pre>
+  <h1>BONGKAR_WEB<span class="cur"></span></h1>
   <p class="lead">Tempel link sebuah web. Kamu akan lihat file apa saja di dalamnya, isi kodenya, cara kerjanya, dan untuk apa web itu dibuat.</p>
 
   <div class="bar">
-    <input id="u" type="url" inputmode="url" autocomplete="off" autocapitalize="off" placeholder="https://contoh.vercel.app" aria-label="Link web">
-    <button class="go" id="go">Periksa</button>
+    <div class="prompt"><span>root@target:~$</span>
+      <input id="u" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://contoh.vercel.app" aria-label="Link web">
+    </div>
+    <button class="go" id="go">Scan</button>
   </div>
-  <p id="status" role="status"></p>
+  <div id="log" role="log" aria-live="polite"></div>
 
   <div id="out" hidden>
     <div class="tabs" role="tablist">
@@ -88,7 +122,30 @@ const kb = n => n == null ? '?' : n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024)
 const LABEL = {html:'HTML', css:'CSS', js:'JavaScript', img:'Gambar', json:'Data/manifest', page:'Halaman lain'};
 const store = {};
 
-function status(msg, err) { const s = $('#status'); s.textContent = msg; s.className = err ? 'err' : ''; }
+/* ---------- terminal log ---------- */
+const clock = () => new Date().toTimeString().slice(0, 8);
+function log(msg, cls) {
+  const box = $('#log');
+  const d = document.createElement('div');
+  d.className = 'l';
+  const t = document.createElement('span'); t.className = 't'; t.textContent = '[' + clock() + '] ';
+  const m = document.createElement('span'); m.className = cls || 'inf'; m.textContent = msg;
+  d.append(t, m);
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function boot() {
+  log('BONGKAR_WEB v1.0 ... online', 'ok');
+  await sleep(150); log('modul parser DOM ........ [OK]', 'dim');
+  await sleep(150); log('modul pelacak file ...... [OK]', 'dim');
+  await sleep(150); log('menunggu target. tempel link lalu tekan SCAN_', 'wrn');
+}
+function bar(done, total) {
+  const w = 20, n = Math.round(w * done / Math.max(total, 1));
+  return '[' + '#'.repeat(n) + '-'.repeat(w - n) + '] ' + Math.round(100 * done / Math.max(total, 1)) + '%';
+}
+function shortUrl(u) { try { const x = new URL(u); return (x.host + x.pathname + x.search).slice(0, 70); } catch (e) { return u; } }
 
 async function getRemote(url) {
   try {
@@ -109,37 +166,55 @@ $('#go').onclick = run;
 
 async function run() {
   let raw = $('#u').value.trim();
-  if (!raw) return status('Isi dulu link webnya.', true);
+  if (!raw) return log('ERROR: target kosong. isi dulu link webnya.', 'err');
   if (!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
   $('#go').disabled = true;
   $('#out').hidden = true;
-  status('Mengambil halaman utama…');
+  $('#log').innerHTML = '';
   try {
+    log('$ scan ' + raw, 'ok');
+    log('menyelesaikan DNS & membuka koneksi ...');
+    log('GET / (halaman utama) ...');
     const main = await getRemote(raw);
     if (main.error) throw new Error(main.error);
     if (!main.text) throw new Error('Link ini bukan halaman teks (tipe: ' + (main.type || 'tidak diketahui') + ').');
-    if (!main.ok) status('Server membalas status ' + main.status + ', tetap dianalisis.');
+    if (!main.ok) log('WARN: server membalas status ' + main.status + ', tetap dianalisis.', 'wrn');
+    else log('200 OK  ' + kb(main.size) + '  ' + (main.type || '').split(';')[0], 'ok');
+    if (main.finalUrl !== raw) log('redirect -> ' + shortUrl(main.finalUrl), 'wrn');
 
     const base = main.finalUrl;
     store[base] = { text: main.text, type: main.type, size: main.size };
+    log('membongkar struktur HTML ...');
     const doc = new DOMParser().parseFromString(main.text, 'text/html');
     const items = collect(doc, base);
+    const cnt = k => items.filter(i => i.kind === k).length;
+    log('ditemukan: ' + cnt('css') + ' css, ' + cnt('js') + ' js, ' + cnt('img') + ' gambar, ' + cnt('json') + ' manifest, ' + cnt('page') + ' link halaman', 'ok');
+    const inl = doc.querySelectorAll('script:not([src])').length;
+    if (inl) log('menemukan ' + inl + ' blok script tertanam di HTML', 'wrn');
 
     const fetchable = items.filter(i => ['css', 'js', 'json'].includes(i.kind)).slice(0, 15);
+    if (items.filter(i => ['css', 'js', 'json'].includes(i.kind)).length > 15) log('batas 15 file pendukung, sisanya dilewati', 'wrn');
+    let done = 0;
     for (let i = 0; i < fetchable.length; i += 5) {
-      status('Membaca file pendukung ' + Math.min(i + 5, fetchable.length) + ' dari ' + fetchable.length + '…');
-      await Promise.all(fetchable.slice(i, i + 5).map(async it => {
+      const batch = fetchable.slice(i, i + 5);
+      log('mengunduh paket ' + (i / 5 + 1) + ' (' + batch.length + ' file) ...');
+      await Promise.all(batch.map(async it => {
         const r = await getRemote(it.url);
         if (r.text != null) store[it.url] = { text: r.text, type: r.type, size: r.size };
         it.size = r.size; it.ok = r.ok; it.err = r.error;
+        done++;
+        if (r.error) log('FAIL  ' + shortUrl(it.url) + '  (' + r.error + ')', 'err');
+        else log('GET   ' + shortUrl(it.url) + '  ' + kb(r.size), 'dim');
       }));
+      log(bar(done, fetchable.length), 'ok');
     }
+    log('menganalisis teknologi & pola kode ...');
     render(doc, base, main, items);
-    status('Selesai. Periksa tab di bawah.');
+    log('SELESAI. akses diberikan ke hasil -> lihat tab di bawah_', 'ok');
     $('#out').hidden = false;
     showTab('ring');
   } catch (e) {
-    status(e.message, true);
+    log('ERROR: ' + e.message, 'err');
   }
   $('#go').disabled = false;
 }
@@ -223,9 +298,11 @@ function render(doc, base, main, items) {
   if (f.manifest || f.sw) tech.push('PWA');
   if (/\.vercel\.app$/.test(new URL(base).hostname)) tech.push('Vercel');
   if (/\.github\.io$/.test(new URL(base).hostname)) tech.push('GitHub Pages');
+  log('teknologi terdeteksi: ' + (tech.length ? tech.join(', ') : 'vanilla HTML/CSS/JS'), 'ok');
 
   const apis = [...new Set((allJs.match(/https?:\/\/[^\s"'`<>)\\]+/g) || []).map(s => s.replace(/[.,;]+$/, '')))]
     .filter(s => !/w3\.org|schema\.org|reactjs\.org|github\.com\/facebook|mozilla\.org/.test(s)).slice(0, 8);
+  if (apis.length) log('endpoint luar di kode JS: ' + apis.length + ' alamat', 'wrn');
 
   const purpose = guessPurpose(doc, items, allJs);
   const desc = (doc.querySelector('meta[name=description]') || {}).content || '';
@@ -247,7 +324,7 @@ function render(doc, base, main, items) {
       <p class="mut">Ini perkiraan otomatis dari kata-kata yang muncul, bukan kepastian.</p></div>
     <div class="card"><h2>Teknologi yang terdeteksi</h2>
       ${tech.length ? `<div class="tags">${tech.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : '<p class="mut">Hanya HTML, CSS, dan JavaScript biasa.</p>'}
-      ${apis.length ? `<p class="mut" style="margin-top:12px">Alamat luar yang disebut di kode JS:</p><div class="tags">${apis.map(a => `<span class="tag" style="word-break:break-all;border-radius:8px">${esc(a)}</span>`).join('')}</div>` : ''}</div>
+      ${apis.length ? `<p class="mut" style="margin-top:12px">Alamat luar yang disebut di kode JS:</p><div class="tags">${apis.map(a => `<span class="tag" style="word-break:break-all">${esc(a)}</span>`).join('')}</div>` : ''}</div>
     <p class="note">Yang terlihat hanya kode yang dikirim ke browser. Kode server atau isi database tidak bisa dilihat dari luar.</p>`;
 
   // File
@@ -304,7 +381,7 @@ function openFile(url, kind) {
   } else {
     const s = store[url];
     const shown = s.text.length > 200000 ? s.text.slice(0, 200000) + '\n\n… (dipotong, file terlalu panjang)' : s.text;
-    p.innerHTML = `<div class="viewhead"><b>${esc(name)}</b><button class="see" id="cp">Salin</button></div><div class="mut" style="margin-bottom:8px">${esc(url)} · ${kb(s.size)}</div><pre></pre>`;
+    p.innerHTML = `<div class="viewhead"><b>$ cat ${esc(name)}</b><button class="see" id="cp">Salin</button></div><div class="mut" style="margin-bottom:8px">${esc(url)} · ${kb(s.size)}</div><pre></pre>`;
     p.querySelector('pre').textContent = shown;
     $('#cp').onclick = async e => {
       try { await navigator.clipboard.writeText(s.text); e.target.textContent = 'Tersalin'; } catch (x) { e.target.textContent = 'Gagal salin'; }
@@ -313,6 +390,31 @@ function openFile(url, kind) {
   showTab('kode');
   window.scrollTo({ top: 0 });
 }
+
+/* ---------- matrix rain ---------- */
+(function () {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c = $('#rain'), x = c.getContext('2d');
+  const chars = '01';
+  let cols, drops, fs = 14;
+  function size() {
+    c.width = innerWidth; c.height = innerHeight;
+    cols = Math.ceil(c.width / fs);
+    drops = Array.from({ length: cols }, () => Math.random() * c.height / fs);
+  }
+  size(); addEventListener('resize', size);
+  setInterval(() => {
+    x.fillStyle = 'rgba(3,8,6,.12)'; x.fillRect(0, 0, c.width, c.height);
+    x.fillStyle = '#00ff7f'; x.font = fs + 'px monospace';
+    for (let i = 0; i < cols; i++) {
+      x.fillText(chars[Math.floor(Math.random() * chars.length)], i * fs, drops[i] * fs);
+      if (drops[i] * fs > c.height && Math.random() > .975) drops[i] = 0;
+      drops[i]++;
+    }
+  }, 60);
+})();
+
+boot();
 </script>
 </body>
 </html>
