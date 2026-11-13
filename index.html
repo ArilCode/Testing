@@ -1219,7 +1219,7 @@ document.querySelectorAll('[data-l]').forEach(b => b.onclick = () => setLang(b.d
 (function () {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const c = $('#rain'), x = c.getContext('2d');
-  const chars = '01アイウエオカキクケコサシスセソ{}<>/;=$#';
+  const chars = '01';
   let cols, drops, fs = 14;
   function size() { c.width = innerWidth; c.height = innerHeight; cols = Math.ceil(c.width / fs); drops = Array.from({ length: cols }, () => Math.random() * c.height / fs); }
   size(); addEventListener('resize', size);
