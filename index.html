@@ -111,10 +111,6 @@ pre.ascii{background:none;border:0;padding:0;max-height:none;overflow:hidden}
   <h1>BONGKAR_WEB<span class="cur"></span></h1>
 
   <div class="switch">
-    <div class="seg" role="group" aria-label="Mode">
-      <button data-m="1" data-i18n="m1" aria-pressed="true"></button>
-      <button data-m="2" data-i18n="m2" aria-pressed="false"></button>
-    </div>
     <div class="seg" role="group" aria-label="Language">
       <button data-l="id" aria-pressed="true">ID</button>
       <button data-l="en" aria-pressed="false">EN</button>
@@ -123,7 +119,8 @@ pre.ascii{background:none;border:0;padding:0;max-height:none;overflow:hidden}
   <p class="lead" data-i18n="lead"></p>
 
   <!-- TIPE 1: link + tombol scan -->
-  <section id="v1">
+  <section id="v1" hidden>
+    <p style="margin:0 0 12px"><button class="chip" id="back" data-i18n="backBtn"></button></p>
     <div class="bar">
       <div class="prompt"><span>root@target:~$</span>
         <input id="u" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-ph="ph" aria-label="URL">
@@ -147,7 +144,7 @@ pre.ascii{background:none;border:0;padding:0;max-height:none;overflow:hidden}
   </section>
 
   <!-- TIPE 2: terminal ketik sungguhan -->
-  <section id="v2" hidden>
+  <section id="v2">
     <div class="term" id="term">
       <div id="tout" role="log" aria-live="polite"></div>
       <form class="tline" id="tform" autocomplete="off">
@@ -159,6 +156,7 @@ pre.ascii{background:none;border:0;padding:0;max-height:none;overflow:hidden}
       <button class="chip" data-cmd="help">help</button>
       <button class="chip" data-cmd="ls">ls</button>
       <button class="chip" data-cmd="info">info</button>
+      <button class="chip" data-cmd="gui">gui</button>
       <button class="chip" data-cmd="clear">clear</button>
       <button class="chip" data-cmd="y">y</button>
       <button class="chip" data-cmd="n">n</button>
@@ -179,7 +177,7 @@ let S = null;          // hasil scan terakhir (dipakai tipe 1 dan tipe 2)
 const I = {
 id: {
   m1:'1 · Scan', m2:'2 · Terminal',
-  lead:'Tempel link sebuah web. Kamu akan lihat file apa saja di dalamnya, isi kodenya, cara kerjanya, dan untuk apa web itu dibuat. Tipe 1 pakai tombol, tipe 2 ketik perintah seperti terminal.',
+  lead:'Tempel link sebuah web. Kamu akan lihat file apa saja di dalamnya, isi kodenya, cara kerjanya, dan untuk apa web itu dibuat. Mulai dari terminal di bawah: ketik help. Ketik gui untuk masuk tipe 1 (tombol Scan).',
   ph:'https://contoh.vercel.app', scanBtn:'Scan',
   tabRing:'Ringkasan', tabFile:'File', tabCara:'Cara kerja', tabKode:'Isi file',
   codeHint:'Pilih sebuah file di tab File, lalu tekan Lihat isi.',
@@ -227,27 +225,9 @@ id: {
   sEnd:'Hasil akhirnya: browser menggabungkan HTML, CSS, dan JS menjadi halaman yang kamu lihat dan pakai.',
   noteEmpty:'Halaman ini hampir kosong dari sisi browser. Kalau webnya dibuat dengan React/Next, isinya baru dibuat oleh JavaScript, jadi analisis ini mungkin kurang lengkap.',
   // terminal
-  tWelcome:"ketik 'help' untuk daftar perintah. ketik 'scan <url>' untuk mulai.",
+  tWelcome:"ketik 'help' untuk daftar perintah. 'scan <url>' untuk memindai, 'gui' untuk tipe 1 (tombol Scan).",
   tHaveData:'data dari {0} sudah dimuat. coba: ls',
-  help:`Perintah yang tersedia:
-  help                  tampilkan bantuan ini
-  scan <url>            pindai sebuah web (ada konfirmasi y/n)
-  ls [-l] [folder]      lihat isi folder     (ll = ls -l)
-  cd <folder>           pindah folder (cd .. naik, cd / ke root)
-  pwd                   folder sekarang
-  tree [folder]         pohon file
-  cat <file>            tampilkan isi file
-  head|tail <file> [n]  n baris awal / akhir (default 10)
-  grep [-i] <pola> [file]  cari teks di semua file hasil scan
-  stat <file>           detail sebuah file
-  info                  ringkasan, tujuan, teknologi
-  explain               cara kerja web ini
-  rm <file>             coba hapus (read-only, cuma tiruan)
-  history               riwayat perintah
-  lang id|en            ganti bahasa
-  mode 1|2              ganti tipe tampilan
-  echo, date, whoami, clear, exit
-Tab = lengkapi otomatis, panah atas/bawah = riwayat, Ctrl+L = clear.`,
+  help:"Perintah yang tersedia:\n  help                  tampilkan bantuan ini\n  scan [-y] <url>       pindai sebuah web (konfirmasi y/n, -y = langsung)\n  gui [url]             masuk tipe 1 (tombol Scan); Esc = kembali ke terminal\n  ls [-la] [folder]     lihat isi folder     (ll, la)\n  cd <folder>           pindah folder (cd .. naik, cd - balik, cd ~ root)\n  pwd                   folder sekarang\n  tree [folder]         pohon file\n  cat [-y] <file>       tampilkan isi file   (less, more; -y = tanpa konfirmasi)\n  head|tail <file> [n]  n baris awal / akhir (default 10)\n  grep [-i] <pola> [file]  cari teks di semua file hasil scan\n  find [nama]           cari nama file\n  wc <file>             hitung baris, kata, byte\n  file <file>           jenis file\n  stat <file>           detail sebuah file\n  du                    ukuran file\n  info                  ringkasan, tujuan, teknologi\n  explain               cara kerja web ini\n  rm <file>             coba hapus (read-only, cuma tiruan)\n  history, !!           riwayat perintah / ulangi perintah terakhir\n  lang id|en            ganti bahasa\n  mode 1|2              ganti tipe (1 = gui, 2 = terminal)\n  clear (cl, cls)       bersihkan layar\n  echo, date, whoami, hostname, uname, exit\n<perintah> --help = pemakaian singkat.\nTab = lengkapi otomatis, panah atas/bawah = riwayat, Ctrl+L = clear.",
   notFound:"{0}: perintah tidak ditemukan. ketik 'help'.",
   didYouMean:'maksudmu: scan {0} ?',
   noData:'belum ada data. jalankan dulu: scan <url>',
@@ -271,11 +251,13 @@ Tab = lengkapi otomatis, panah atas/bawah = riwayat, Ctrl+L = clear.`,
   sudo:'kamu tidak ada di daftar sudoers. kejadian ini akan dilaporkan. (bercanda)',
   langSet:'bahasa: Indonesia', langUsage:'pemakaian: lang id|en',
   modeSet:'pindah ke tipe {0}', modeUsage:'pemakaian: mode 1|2',
-  exitMsg:'keluar... pindah ke tipe 1 (Scan).'
+  exitMsg:'logout',
+  backBtn:'← terminal (Esc)', alreadyTerm:'kamu sudah di terminal (tipe 2). ketik gui untuk tipe 1.',
+  roFs:'{0}: operasi ditolak: sistem file read-only', useScan:'{0}: tidak tersedia di sini. pakai: scan <url>'
 },
 en: {
   m1:'1 · Scan', m2:'2 · Terminal',
-  lead:"Paste a website link. You'll see which files it uses, their code, how it works, and what the site is for. Type 1 uses a button, type 2 is a typed terminal.",
+  lead:"Paste a website link. You'll see which files it uses, their code, how it works, and what the site is for. Start from the terminal below: type help. Type gui to enter type 1 (Scan button).",
   ph:'https://example.vercel.app', scanBtn:'Scan',
   tabRing:'Summary', tabFile:'Files', tabCara:'How it works', tabKode:'File content',
   codeHint:'Pick a file in the Files tab, then press View.',
@@ -320,27 +302,9 @@ en: {
   sWs:'Uses WebSocket to receive live data without reloading the page.',
   sEnd:'Finally, the browser combines HTML, CSS and JS into the page you see and use.',
   noteEmpty:"This page is almost empty from the browser's side. If the site is built with React/Next, its content is created by JavaScript, so this analysis may be incomplete.",
-  tWelcome:"type 'help' for the list of commands. type 'scan <url>' to begin.",
+  tWelcome:"type 'help' for the command list. 'scan <url>' to scan, 'gui' for type 1 (Scan button).",
   tHaveData:'data from {0} is already loaded. try: ls',
-  help:`Available commands:
-  help                  show this help
-  scan <url>            scan a website (asks y/n first)
-  ls [-l] [folder]      list a folder        (ll = ls -l)
-  cd <folder>           change folder (cd .. up, cd / to root)
-  pwd                   current folder
-  tree [folder]         file tree
-  cat <file>            print a file
-  head|tail <file> [n]  first / last n lines (default 10)
-  grep [-i] <pattern> [file]  search text in all scanned files
-  stat <file>           details of a file
-  info                  summary, purpose, technology
-  explain               how this site works
-  rm <file>             try to delete (read-only, just a mock)
-  history               command history
-  lang id|en            change language
-  mode 1|2              change view type
-  echo, date, whoami, clear, exit
-Tab = autocomplete, up/down arrows = history, Ctrl+L = clear.`,
+  help:"Available commands:\n  help                  show this help\n  scan [-y] <url>       scan a website (asks y/n, -y = skip the question)\n  gui [url]             enter type 1 (Scan button); Esc = back to terminal\n  ls [-la] [folder]     list a folder        (ll, la)\n  cd <folder>           change folder (cd .. up, cd - back, cd ~ root)\n  pwd                   current folder\n  tree [folder]         file tree\n  cat [-y] <file>       print a file         (less, more; -y = no question)\n  head|tail <file> [n]  first / last n lines (default 10)\n  grep [-i] <pattern> [file]  search text in all scanned files\n  find [name]           search file names\n  wc <file>             count lines, words, bytes\n  file <file>           file type\n  stat <file>           details of a file\n  du                    file sizes\n  info                  summary, purpose, technology\n  explain               how this site works\n  rm <file>             try to delete (read-only, just a mock)\n  history, !!           command history / repeat last command\n  lang id|en            change language\n  mode 1|2              change type (1 = gui, 2 = terminal)\n  clear (cl, cls)       clear the screen\n  echo, date, whoami, hostname, uname, exit\n<command> --help = short usage.\nTab = autocomplete, up/down arrows = history, Ctrl+L = clear.",
   notFound:"{0}: command not found. type 'help'.",
   didYouMean:'did you mean: scan {0} ?',
   noData:'no data yet. run first: scan <url>',
@@ -364,13 +328,14 @@ Tab = autocomplete, up/down arrows = history, Ctrl+L = clear.`,
   sudo:'you are not in the sudoers file. This incident will be reported. (just kidding)',
   langSet:'language: English', langUsage:'usage: lang id|en',
   modeSet:'switching to type {0}', modeUsage:'usage: mode 1|2',
-  exitMsg:'exit... switching to type 1 (Scan).'
+  exitMsg:'logout',
+  backBtn:'← terminal (Esc)', alreadyTerm:'you are already in the terminal (type 2). type gui for type 1.',
+  roFs:'{0}: operation not permitted: read-only file system', useScan:'{0}: not available here. use: scan <url>'
 }
 };
-let lang = 'id', mode = '1';
+let lang = 'id', mode = '2';
 try {
   lang = localStorage.getItem('bw_lang') || (/^id/i.test(navigator.language || '') ? 'id' : 'en');
-  mode = localStorage.getItem('bw_mode') || '1';
 } catch (e) { lang = /^id/i.test(navigator.language || '') ? 'id' : 'en'; }
 if (!I[lang]) lang = 'id';
 if (mode !== '1' && mode !== '2') mode = '1';
@@ -710,7 +675,7 @@ function norm(p) {
   for (const s of p.split('/')) { if (!s || s === '.') continue; if (s === '..') { parts.pop(); continue; } parts.push(s); }
   return '/' + parts.join('/');
 }
-const resolve = p => !p ? TS.cwd : norm(p.startsWith('/') ? p : TS.cwd + '/' + p);
+const resolve = p => { if (!p) return TS.cwd; if (p === '~' || p.startsWith('~/')) p = p.slice(1) || '/'; return norm(p.startsWith('/') ? p : TS.cwd + '/' + p); };
 const isDir = path => path === '/' || S.vfs.some(e => e.path.startsWith(path + '/'));
 function listDir(path) {
   const pre = path === '/' ? '/' : path + '/', m = new Map();
@@ -781,23 +746,32 @@ const CMDS = {
   pwd: async () => tp(TS.cwd),
   history: async () => tp(TS.hist.map((h, i) => String(i + 1).padStart(4) + '  ' + h).join('\n')),
   sudo: async () => tp(t('sudo'), 'err'),
-  exit: async () => { tp(t('exitMsg'), 'dim'); setTimeout(() => setMode('1'), 500); },
+  exit: async () => { tp('logout', 'dim'); setTimeout(() => { tout().innerHTML = ''; TS.cwd = '/'; welcome(); updatePrompt(); }, 600); },
   lang: async a => {
     if (a[0] === 'id' || a[0] === 'en') { setLang(a[0]); tp(t('langSet'), 'ok'); } else tp(t('langUsage'), 'wrn');
   },
   mode: async a => {
-    if (a[0] === '1' || a[0] === '2') { tp(t('modeSet', a[0]), 'ok'); if (a[0] === '1') setTimeout(() => setMode('1'), 400); } else tp(t('modeUsage'), 'wrn');
+    if (a[0] === '1') { tp(t('modeSet', '1'), 'ok'); setTimeout(() => setMode('1'), 400); }
+    else if (a[0] === '2') tp(t('alreadyTerm'), 'dim');
+    else tp(t('modeUsage'), 'wrn');
+  },
+  gui: async a => {
+    const raw = a.find(x => !x.startsWith('-'));
+    tp(t('modeSet', '1'), 'ok');
+    setTimeout(() => { setMode('1'); if (raw) { $('#u').value = raw; run(); } }, 400);
   },
   scan: async a => {
-    let raw = (a[0] || '').trim();
+    const yes = a.some(x => x === '-y' || x === '--yes');
+    let raw = (a.find(x => !x.startsWith('-')) || '').trim();
     if (!raw) return tp(t('usageScan'), 'wrn');
     if (!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
-    ask(t('confirmScan', raw) + (S ? t('replaceNote') : ''), async () => {
+    const go = async () => {
       TS.busy = true;
       try { await scan(raw, tp, true); TS.cwd = '/'; tp(t('doneTerm'), 'ok'); renderPanelsIfShown(); }
       catch (e) { tp(t('errPrefix') + e.message, 'err'); }
       TS.busy = false; updatePrompt();
-    });
+    };
+    if (yes) await go(); else ask(t('confirmScan', raw) + (S ? t('replaceNote') : ''), go);
   },
   ls: async a => {
     if (!need()) return;
@@ -835,7 +809,7 @@ const CMDS = {
     const ft = fileText(r.e); if (ft.msg) return tp(ft.msg, ft.cls);
     const lines = ft.text.split('\n');
     const show = () => { const cap = 2000; tp(lines.slice(0, cap).join('\n')); if (lines.length > cap) tp(t('catMore', lines.length - cap), 'dim'); };
-    if (lines.length > 200) ask(t('catBig', lines.length), show); else show();
+    if (lines.length > 200 && !TS.catYes) ask(t('catBig', lines.length), show); else show();
   },
   head: headTail(false),
   tail: headTail(true),
@@ -899,7 +873,76 @@ const CMDS = {
 CMDS.ll = a => CMDS.ls(['-l', ...a]);
 CMDS.dir = CMDS.ls;
 
+/* ---- alias & perintah tambahan ---- */
+function welcome() {
+  tp('BONGKAR_WEB terminal v1.0', 'ok'); tp(t('tWelcome'), 'dim');
+  if (S) tp(t('tHaveData', new URL(S.base).host), 'wrn');
+}
+const _cat = CMDS.cat;
+CMDS.cat = async a => {
+  TS.catYes = a.some(x => x === '-y' || x === '--yes');
+  return _cat(a.filter(x => x !== '-y' && x !== '--yes'));
+};
+const _cd = CMDS.cd;
+CMDS.cd = async a => {
+  if (a[0] === '-') a = [TS.old || '/'];
+  const before = TS.cwd;
+  await _cd(a);
+  if (TS.cwd !== before) TS.old = before;
+};
+CMDS.cl = CMDS.cls = CMDS.reset = CMDS.clear;
+CMDS.la = a => CMDS.ls(['-la', ...a]);
+CMDS.less = CMDS.more = CMDS.cat;
+CMDS.logout = CMDS.exit;
+CMDS.ui = CMDS.startx = CMDS.gui;
+CMDS.wc = async a => {
+  if (!need()) return;
+  const f = a.find(x => !x.startsWith('-')); if (!f) return tp('usage: wc <file>', 'wrn');
+  const r = findEntry(f); if (!r) return tp(t('catNo', f), 'err');
+  if (r.dir) return tp(t('catDir', f), 'err');
+  const ft = fileText(r.e); if (ft.msg) return tp(ft.msg, ft.cls);
+  const tx = ft.text;
+  tp(' ' + tx.split('\n').length + '  ' + (tx.trim() ? tx.trim().split(/\s+/).length : 0) + '  ' + new Blob([tx]).size + ' ' + r.path);
+};
+CMDS.find = async a => {
+  if (!need()) return;
+  const q = (a.find(x => !x.startsWith('-')) || '').toLowerCase();
+  const hit = S.vfs.filter(e => e.path.toLowerCase().includes(q));
+  if (!hit.length) return tp(t('grepNone'), 'dim');
+  tph(hit.map(e => '<span class="k-' + e.kind + '">' + esc(e.path) + '</span>').join('\n'));
+};
+CMDS.file = async a => {
+  if (!need()) return;
+  if (!a[0]) return tp('usage: file <file>', 'wrn');
+  const r = findEntry(a[0]); if (!r) return tp(t('catNo', a[0]), 'err');
+  if (r.dir) return tp(r.path + '/: directory');
+  tp(r.path + ': ' + t('k_' + r.e.kind) + (r.e.size != null ? ', ' + kb(r.e.size) : '') + ', ' + fileState(r.e));
+};
+CMDS.du = async () => {
+  if (!need()) return;
+  const rows = S.vfs.filter(e => e.size != null).sort((a, b) => b.size - a.size);
+  const tot = rows.reduce((s, e) => s + e.size, 0);
+  tph(rows.map(e => kb(e.size).padStart(9) + '  <span class="k-' + e.kind + '">' + esc(e.path) + '</span>').join('\n') + '\n' + kb(tot).padStart(9) + '  total');
+};
+CMDS.hostname = async () => tp(S ? new URL(S.base).host : 'bongkar');
+CMDS.uname = async a => tp(a.includes('-a') ? 'BongkarOS 1.0 ' + (S ? new URL(S.base).host : 'bongkar') + ' web x86_64 GNU/Browser' : 'BongkarOS');
+['touch', 'mkdir', 'mv', 'cp', 'chmod', 'chown', 'ln', 'tee'].forEach(c => { CMDS[c] = async () => tp(t('roFs', c), 'err'); });
+['curl', 'wget', 'open'].forEach(c => { CMDS[c] = async () => tp(t('useScan', c), 'wrn'); });
+
+const USAGE = {
+  scan: 'usage: scan [-y|--yes] <url>', gui: 'usage: gui [url]', ui: 'usage: gui [url]',
+  ls: 'usage: ls [-la] [path]', ll: 'usage: ll [path]', la: 'usage: la [path]', cd: 'usage: cd [path | - | ~]',
+  cat: 'usage: cat [-y] <file>', less: 'usage: cat [-y] <file>', more: 'usage: cat [-y] <file>',
+  head: 'usage: head [-n N] <file> [N]', tail: 'usage: tail [-n N] <file> [N]',
+  grep: 'usage: grep [-i] <pattern> [file]', find: 'usage: find [name]', wc: 'usage: wc <file>',
+  file: 'usage: file <file>', stat: 'usage: stat <file>', du: 'usage: du', tree: 'usage: tree [path]',
+  rm: 'usage: rm <file>', lang: 'usage: lang id|en', mode: 'usage: mode 1|2',
+  clear: 'usage: clear   (aliases: cl, cls, reset)', cl: 'usage: clear', cls: 'usage: clear',
+  history: 'usage: history   (!! repeats the last command)'
+};
+
 async function exec(line) {
+  if (line.trim() === '!!' && !TS.pending && TS.hist.length) line = TS.hist[TS.hist.length - 1];
   techo(line);
   if (TS.pending) {
     const p = TS.pending; TS.pending = null; updatePrompt();
@@ -910,6 +953,7 @@ async function exec(line) {
   TS.hist.push(s); TS.hi = TS.hist.length;
   const parts = s.split(/\s+/), cmd = parts[0].toLowerCase(), args = parts.slice(1);
   const fn = CMDS[cmd];
+  if (fn && args.includes('--help')) { tp(USAGE[cmd] || ('usage: ' + cmd), 'dim'); return; }
   if (!fn) {
     tp(t('notFound', parts[0]), 'err');
     if (/^https?:\/\//i.test(parts[0])) tp(t('didYouMean', parts[0]), 'dim');
@@ -974,9 +1018,9 @@ function renderPanelsIfShown() { try { renderPanels(); } catch (e) {} }
 
 /* ================= SAKLAR TIPE & BAHASA ================= */
 function setMode(m) {
-  mode = m; try { localStorage.setItem('bw_mode', m); } catch (e) {}
+  mode = m;
   $('#v1').hidden = m !== '1'; $('#v2').hidden = m !== '2';
-  document.querySelectorAll('[data-m]').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === m));
+  if (m === '1') setTimeout(() => $('#u').focus(), 0);
   if (m === '2') {
     if (!TS.welcomed) {
       TS.welcomed = true;
@@ -999,7 +1043,8 @@ function applyLang() {
   if (lastOpen && S) openFile(lastOpen.url, lastOpen.kind, true);
   else $('#p-kode').innerHTML = '<p class="mut">' + esc(t('codeHint')) + '</p>';
 }
-document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => setMode(b.dataset.m));
+$('#back').onclick = () => setMode('2');
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && mode === '1') setMode('2'); });
 document.querySelectorAll('[data-l]').forEach(b => b.onclick = () => setLang(b.dataset.l));
 
 /* ================= HUJAN KODE ================= */
